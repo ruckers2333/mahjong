@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>广东麻将 - demo</title>
+    <title>广东麻将 - 无不良影响</title>
     <style>
         :root {
             --player-tile-w: 52px;
@@ -157,6 +157,11 @@
             color: #000;
         }
         
+        .tile.red-dragon {
+            color: #f00;
+            background: #fff5f5;
+        }
+        
         .tile.discarded {
             opacity: 0.7;
         }
@@ -203,6 +208,11 @@
             color: #000;
         }
         
+        .ai-tile.red-dragon {
+            color: #f00;
+            background: #fff5f5;
+        }
+        
         .discard-tile {
             width: var(--discard-tile-w);
             height: var(--discard-tile-h);
@@ -229,6 +239,11 @@
         .discard-tile.honor {
             font-size: 16px;
             color: #000;
+        }
+        
+        .discard-tile.red-dragon {
+            color: #f00;
+            background: #fff5f5;
         }
         
         .meld {
@@ -267,43 +282,50 @@
             color: #000;
         }
         
+        .meld-tile.red-dragon {
+            color: #f00;
+            background: #fff5f5;
+        }
+        
         .melds-container {
             display: flex;
-            flex-direction: row;
             gap: 8px;
             margin-top: 8px;
             position: absolute;
             z-index: 5;
         }
         
+        /* 南玩家（底部）- 碰杠牌放在右边 */
         #melds-0 {
             bottom: 120px;
-            left: 50%;
-            transform: translateX(-50%);
+            right: 50px;
+            flex-direction: row;
         }
         
+        /* 东玩家（右侧）- 碰杠牌放在上面 */
         #melds-1 {
-            top: 50%;
+            top: 50px;
             right: 120px;
-            transform: translateY(-50%);
             flex-direction: column;
         }
         
+        /* 北玩家（顶部）- 碰杠牌放在左边 */
         #melds-2 {
-            top: 50%;
+            top: 120px;
+            left: 50px;
+            flex-direction: row;
+        }
+        
+        /* 西玩家（左侧）- 碰杠牌放在下面 */
+        #melds-3 {
+            bottom: 50px;
             left: 120px;
-            transform: translateY(-50%);
             flex-direction: column;
         }
         
-        #melds-3 {
-            top: 120px;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-        
+        /* 统一所有牌的背面为灰色 */
         .back {
-            background: #999;
+            background: #999 !important;
         }
         
         .controls {
@@ -572,7 +594,7 @@
             to { transform: translateX(-50%) scale(1.05); }
         }
         
-        /* 开发者模式样式 */
+        /* 开发者模式样式 - 可拖动 */
         .dev-panel {
             position: fixed;
             bottom: 20px;
@@ -587,6 +609,7 @@
             max-width: 300px;
             max-height: 400px;
             overflow-y: auto;
+            cursor: move;
         }
         
         .dev-panel.active {
@@ -598,6 +621,8 @@
             margin-top: 0;
             margin-bottom: 10px;
             text-align: center;
+            cursor: move;
+            user-select: none;
         }
         
         .tile-palette {
@@ -639,6 +664,11 @@
         
         .dev-tile.honor {
             font-size: 16px;
+        }
+        
+        .dev-tile.red-dragon {
+            color: #f00;
+            background: #fff5f5;
         }
         
         .dev-controls {
@@ -802,7 +832,7 @@
             }
             
             #melds-3 {
-                top: 100px;
+                bottom: 40px;
             }
             
             .scoreboard {
@@ -913,19 +943,21 @@
             }
             
             #melds-1 {
-                right: 50px;
+                right: 40px;
             }
             
             #melds-2 {
-                left: 50px;
+                left: 40px;
             }
             
             #melds-0 {
                 bottom: 80px;
+                right: 30px;
             }
             
             #melds-3 {
-                top: 80px;
+                bottom: 30px;
+                left: 80px;
             }
             
             .scoreboard {
@@ -1088,19 +1120,21 @@
             }
             
             #melds-1 {
-                right: 40px;
+                right: 30px;
             }
             
             #melds-2 {
-                left: 40px;
+                left: 30px;
             }
             
             #melds-0 {
                 bottom: 60px;
+                right: 20px;
             }
             
             #melds-3 {
-                top: 60px;
+                bottom: 20px;
+                left: 60px;
             }
             
             .scoreboard {
@@ -1268,8 +1302,11 @@
 </head>
 <body>
     <header>
-        <h1>广东麻将 - 无不良引导</h1>
-        <p>抵制不良游戏，拒绝盗版游戏。 注意自我保护，谨防受骗上当。 适度游戏益脑，沉迷游戏伤身。 合理安排时间，享受健康生活。</p>
+        <h1>广东麻将 - 红中变</h1>
+        <p>抵制不良游戏，拒绝盗版游戏。
+注意自我保护，谨防受骗上当。
+适度游戏益脑，沉迷游戏伤身。
+合理安排时间，享受健康生活。</p>
     </header>
     
     <div class="main-container">
@@ -1327,6 +1364,7 @@
                 </div>
                 <div class="log" id="log">
                     <p>游戏已就绪，点击"开始新局"按钮开始游戏。</p>
+                    <p>红中变玩法：红中可以作为万能牌使用，但不能用于碰或杠。</p>
                 </div>
             </div>
         </div>
@@ -1353,6 +1391,7 @@
             <button id="btn-clear-hand">清空手牌</button>
             <button id="btn-test-win">测试胡牌</button>
             <button id="btn-add-random">随机添加5张牌</button>
+            <button id="btn-add-red-dragon">添加红中</button>
         </div>
         <div class="dev-info">
             <p>点击牌库中的牌添加到手牌</p>
@@ -1393,7 +1432,8 @@
             skipPengGang: false,
             newDrawTileId: null,
             winPromptTimer: null,
-            devMode: false // 开发者模式状态
+            devMode: false, // 开发者模式状态
+            redDragonWildcard: true // 红中变玩法开关
         };
         
         // DOM元素
@@ -1414,6 +1454,68 @@
         const clearHandBtn = document.getElementById('btn-clear-hand');
         const testWinBtn = document.getElementById('btn-test-win');
         const addRandomBtn = document.getElementById('btn-add-random');
+        const addRedDragonBtn = document.getElementById('btn-add-red-dragon');
+        
+        // 开发者面板拖动功能
+        let isDragging = false;
+        let dragOffsetX, dragOffsetY;
+        
+        // 初始化开发者面板拖动功能
+        function initDevPanelDrag() {
+            const devPanelHeader = devPanel.querySelector('h3');
+            
+            devPanelHeader.addEventListener('mousedown', startDrag);
+            document.addEventListener('mousemove', drag);
+            document.addEventListener('mouseup', stopDrag);
+            
+            // 触摸事件支持
+            devPanelHeader.addEventListener('touchstart', startDragTouch);
+            document.addEventListener('touchmove', dragTouch);
+            document.addEventListener('touchend', stopDrag);
+        }
+        
+        function startDrag(e) {
+            isDragging = true;
+            const rect = devPanel.getBoundingClientRect();
+            dragOffsetX = e.clientX - rect.left;
+            dragOffsetY = e.clientY - rect.top;
+            devPanel.style.cursor = 'grabbing';
+        }
+        
+        function startDragTouch(e) {
+            isDragging = true;
+            const touch = e.touches[0];
+            const rect = devPanel.getBoundingClientRect();
+            dragOffsetX = touch.clientX - rect.left;
+            dragOffsetY = touch.clientY - rect.top;
+            devPanel.style.cursor = 'grabbing';
+            e.preventDefault(); // 防止页面滚动
+        }
+        
+        function drag(e) {
+            if (!isDragging) return;
+            
+            devPanel.style.left = (e.clientX - dragOffsetX) + 'px';
+            devPanel.style.top = (e.clientY - dragOffsetY) + 'px';
+            devPanel.style.right = 'auto';
+            devPanel.style.bottom = 'auto';
+        }
+        
+        function dragTouch(e) {
+            if (!isDragging) return;
+            
+            const touch = e.touches[0];
+            devPanel.style.left = (touch.clientX - dragOffsetX) + 'px';
+            devPanel.style.top = (touch.clientY - dragOffsetY) + 'px';
+            devPanel.style.right = 'auto';
+            devPanel.style.bottom = 'auto';
+            e.preventDefault(); // 防止页面滚动
+        }
+        
+        function stopDrag() {
+            isDragging = false;
+            devPanel.style.cursor = 'move';
+        }
         
         // 生成所有麻将牌（136张）
         function makeAllTiles() {
@@ -1514,6 +1616,11 @@
                 el.classList.add('new-draw');
             }
             
+            // 红中特殊样式
+            if (t.type === 'honor' && t.rank === 'red') {
+                el.classList.add('red-dragon');
+            }
+            
             // 开发者模式下添加移除功能
             if (state.devMode && !opts.aiPlayer && !opts.back) {
                 el.classList.add('dev-removable');
@@ -1546,6 +1653,10 @@
         function renderDevTile(t) {
             const el = document.createElement('div');
             el.className = 'dev-tile';
+            
+            if (t.type === 'honor' && t.rank === 'red') {
+                el.classList.add('red-dragon');
+            }
             
             if (t.type === 'honor') {
                 el.classList.add('honor');
@@ -1584,6 +1695,10 @@
             const el = document.createElement('div');
             el.className = 'meld-tile';
             
+            if (t.type === 'honor' && t.rank === 'red') {
+                el.classList.add('red-dragon');
+            }
+            
             if (t.type === 'honor') {
                 el.classList.add('honor');
                 el.textContent = tileToChinese(t);
@@ -1607,6 +1722,10 @@
         function renderDiscardTile(t) {
             const el = document.createElement('div');
             el.className = 'discard-tile';
+            
+            if (t.type === 'honor' && t.rank === 'red') {
+                el.classList.add('red-dragon');
+            }
             
             if (t.type === 'honor') {
                 el.classList.add('honor');
@@ -1769,10 +1888,10 @@
         // 测试胡牌
         function testWinHand() {
             if (state.devMode) {
-                // 创建一个可以胡牌的手牌组合
+                // 创建一个可以胡牌的手牌组合（包含红中）
                 const winHand = [
+                    {suit: 'z', rank: 'red', type: 'honor', id: 'zr-test'}, // 红中
                     {suit: 'm', rank: 1, type: 'number', id: 'm1-test'},
-                    {suit: 'm', rank: 1, type: 'number', id: 'm1-test2'},
                     {suit: 'm', rank: 2, type: 'number', id: 'm2-test'},
                     {suit: 'm', rank: 3, type: 'number', id: 'm3-test'},
                     {suit: 'm', rank: 4, type: 'number', id: 'm4-test'},
@@ -1782,16 +1901,16 @@
                     {suit: 'm', rank: 8, type: 'number', id: 'm8-test'},
                     {suit: 'm', rank: 9, type: 'number', id: 'm9-test'},
                     {suit: 'm', rank: 9, type: 'number', id: 'm9-test2'},
-                    {suit: 'm', rank: 9, type: 'number', id: 'm9-test3'},
                     {suit: 'p', rank: 1, type: 'number', id: 'p1-test'},
-                    {suit: 'p', rank: 1, type: 'number', id: 'p1-test2'}
+                    {suit: 'p', rank: 1, type: 'number', id: 'p1-test2'},
+                    {suit: 'p', rank: 1, type: 'number', id: 'p1-test3'}
                 ];
                 
                 state.hands[0] = winHand;
                 sortHand(state.hands[0]);
                 renderAll();
                 checkWinCondition(0);
-                log('开发者模式：设置测试胡牌手牌');
+                log('开发者模式：设置测试胡牌手牌（包含红中）');
             }
         }
         
@@ -1808,6 +1927,18 @@
                 renderAll();
                 checkWinCondition(0);
                 log('开发者模式：随机添加5张牌到手牌');
+            }
+        }
+        
+        // 添加红中到手牌
+        function addRedDragon() {
+            if (state.devMode) {
+                const redDragon = {suit: 'z', rank: 'red', type: 'honor', id: `zr-${Date.now()}`};
+                state.hands[0].push(redDragon);
+                sortHand(state.hands[0]);
+                renderAll();
+                checkWinCondition(0);
+                log('开发者模式：添加红中到手牌');
             }
         }
         
@@ -1877,6 +2008,7 @@
             hideActionButtons();
             log('新局开始。庄家（你，南家）14 张牌，请先出牌。');
             log(`剩余牌数: ${state.wall.length}`);
+            log('红中变玩法：红中可以作为万能牌使用，但不能用于碰或杠。');
         }
         
         // 排序手牌
@@ -2047,6 +2179,11 @@
             let count = 0;
             
             for (const t of hand) {
+                // 红中不能用于碰
+                if (state.redDragonWildcard && t.type === 'honor' && t.rank === 'red') {
+                    continue;
+                }
+                
                 if (tileId(t) === tileIdStr) {
                     count++;
                 }
@@ -2064,6 +2201,11 @@
             let count = 0;
             
             for (const t of hand) {
+                // 红中不能用于杠
+                if (state.redDragonWildcard && t.type === 'honor' && t.rank === 'red') {
+                    continue;
+                }
+                
                 if (tileId(t) === tileIdStr) {
                     count++;
                 }
@@ -2211,7 +2353,7 @@
             processPendingActionsAfterReaction();
         }
         
-        // 检查是否可以胡牌 - 改进的3n+2模式
+        // 检查是否可以胡牌 - 支持红中作为万能牌
         function checkWinCondition(playerIndex) {
             const hand = [...state.hands[playerIndex]];
             
@@ -2223,9 +2365,15 @@
             
             // 统计每种牌的数量
             const counts = {};
+            let redDragons = 0; // 红中数量
+            
             for (const tile of hand) {
-                const id = tileId(tile);
-                counts[id] = (counts[id] || 0) + 1;
+                if (state.redDragonWildcard && tile.type === 'honor' && tile.rank === 'red') {
+                    redDragons++;
+                } else {
+                    const id = tileId(tile);
+                    counts[id] = (counts[id] || 0) + 1;
+                }
             }
             
             // 尝试每种牌作为将牌（对子）
@@ -2237,25 +2385,52 @@
                     if (newCounts[id] === 0) delete newCounts[id];
                     
                     // 检查剩下的牌是否能组成n组面子
-                    if (canFormMeldGroups(newCounts, n)) {
+                    if (canFormMeldGroupsWithRedDragon(newCounts, redDragons, n)) {
                         return true;
                     }
+                }
+                
+                // 尝试将牌是一张普通牌加一个红中
+                if (counts[id] >= 1 && redDragons >= 1) {
+                    const newCounts = {...counts};
+                    newCounts[id] -= 1;
+                    if (newCounts[id] === 0) delete newCounts[id];
+                    
+                    if (canFormMeldGroupsWithRedDragon(newCounts, redDragons - 1, n)) {
+                        return true;
+                    }
+                }
+            }
+            
+            // 尝试将牌是两个红中
+            if (redDragons >= 2) {
+                if (canFormMeldGroupsWithRedDragon(counts, redDragons - 2, n)) {
+                    return true;
                 }
             }
             
             return false;
         }
         
-        // 检查是否能组成顺子或刻子组合
-        function canFormMeldGroups(counts, n) {
+        // 检查是否能组成顺子或刻子组合（支持红中作为万能牌）
+        function canFormMeldGroupsWithRedDragon(counts, redDragons, n) {
             // 如果没有牌了，说明全部匹配成功
-            if (Object.keys(counts).length === 0) return true;
+            if (Object.keys(counts).length === 0 && redDragons === 0) return true;
             
             // 如果n=0，只需要一个对子即可胡牌
-            if (n === 0) return Object.keys(counts).length === 0;
+            if (n === 0) return Object.keys(counts).length === 0 && redDragons === 0;
             
             // 获取所有牌型
             const keys = Object.keys(counts);
+            
+            // 如果没有普通牌了，只能用红中组成面子
+            if (keys.length === 0) {
+                if (redDragons >= 3) {
+                    return canFormMeldGroupsWithRedDragon(counts, redDragons - 3, n - 1);
+                }
+                return false;
+            }
+            
             const firstKey = keys[0];
             
             // 解析牌型
@@ -2268,7 +2443,18 @@
                 newCounts[firstKey] -= 3;
                 if (newCounts[firstKey] === 0) delete newCounts[firstKey];
                 
-                if (canFormMeldGroups(newCounts, n - 1)) {
+                if (canFormMeldGroupsWithRedDragon(newCounts, redDragons, n - 1)) {
+                    return true;
+                }
+            }
+            
+            // 检查用红中补足刻子
+            if (counts[firstKey] + redDragons >= 3) {
+                const needRedDragons = Math.max(0, 3 - counts[firstKey]);
+                const newCounts = {...counts};
+                delete newCounts[firstKey]; // 移除这种牌的所有数量
+                
+                if (canFormMeldGroupsWithRedDragon(newCounts, redDragons - needRedDragons, n - 1)) {
                     return true;
                 }
             }
@@ -2278,7 +2464,11 @@
                 const next1 = `${suit}${rank + 1}`;
                 const next2 = `${suit}${rank + 2}`;
                 
-                if (counts[firstKey] > 0 && counts[next1] > 0 && counts[next2] > 0) {
+                const count1 = counts[next1] || 0;
+                const count2 = counts[next2] || 0;
+                
+                // 检查是否可以直接组成顺子
+                if (counts[firstKey] > 0 && count1 > 0 && count2 > 0) {
                     const newCounts = {...counts};
                     newCounts[firstKey] -= 1;
                     newCounts[next1] -= 1;
@@ -2289,7 +2479,35 @@
                         if (newCounts[key] === 0) delete newCounts[key];
                     }
                     
-                    if (canFormMeldGroups(newCounts, n - 1)) {
+                    if (canFormMeldGroupsWithRedDragon(newCounts, redDragons, n - 1)) {
+                        return true;
+                    }
+                }
+                
+                // 检查用红中补足顺子
+                let missing = 0;
+                if (counts[firstKey] === 0) missing++;
+                if (count1 === 0) missing++;
+                if (count2 === 0) missing++;
+                
+                if (redDragons >= missing) {
+                    const newCounts = {...counts};
+                    
+                    // 减去已有的牌
+                    if (counts[firstKey] > 0) {
+                        newCounts[firstKey] -= 1;
+                        if (newCounts[firstKey] === 0) delete newCounts[firstKey];
+                    }
+                    if (count1 > 0) {
+                        newCounts[next1] -= 1;
+                        if (newCounts[next1] === 0) delete newCounts[next1];
+                    }
+                    if (count2 > 0) {
+                        newCounts[next2] -= 1;
+                        if (newCounts[next2] === 0) delete newCounts[next2];
+                    }
+                    
+                    if (canFormMeldGroupsWithRedDragon(newCounts, redDragons - missing, n - 1)) {
                         return true;
                     }
                 }
@@ -2511,6 +2729,9 @@
         
         // 初始化游戏
         function initGame() {
+            // 初始化开发者面板拖动功能
+            initDevPanelDrag();
+            
             startBtn.addEventListener('click', () => {
                 reset();
             });
@@ -2613,7 +2834,12 @@
                 addRandomTiles();
             });
             
+            addRedDragonBtn.addEventListener('click', () => {
+                addRedDragon();
+            });
+            
             log('游戏已就绪，点击"开始新局"按钮开始游戏。');
+            log('红中变玩法：红中可以作为万能牌使用，但不能用于碰或杠。');
         }
         
         initGame();
