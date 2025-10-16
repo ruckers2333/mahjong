@@ -22,6 +22,7 @@
             margin: 0;
             padding: 0;
             -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
         }
         
         body {
@@ -35,7 +36,6 @@
             min-height: 100vh;
             overflow-x: hidden;
             padding: 10px;
-            touch-action: manipulation;
         }
         
         header {
@@ -86,6 +86,7 @@
             justify-content: flex-end;
             min-width: 280px;
             max-width: 350px;
+            width: 100%;
         }
         
         /* 听牌信息栏样式 */
@@ -96,6 +97,7 @@
             margin-bottom: 10px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
             display: none;
+            width: 100%;
         }
         
         .tingpai-panel.active {
@@ -154,8 +156,8 @@
             color: white;
             margin-bottom: 15px;
             width: 100%;
-            padding: 10px;
-            border-radius: 6px;
+            padding: 12px;
+            border-radius: 8px;
             border: none;
             font-weight: 700;
             cursor: pointer;
@@ -178,6 +180,7 @@
             padding: 15px;
             border-radius: 10px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            width: 100%;
         }
         
         .player-box {
@@ -204,6 +207,44 @@
             align-items: center;
         }
         
+        /* 手机端南玩家手牌滑动浏览样式 */
+        #hand-0.mobile-slider {
+            display: flex;
+            flex-direction: row;
+            width: 100%;
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding: 8px 0 15px 0;
+            justify-content: flex-start;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+            position: relative;
+            scrollbar-width: thin;
+            scrollbar-color: #ffd66b rgba(255, 255, 255, 0.1);
+            /* 确保手牌区域可以完全滚动 */
+            max-width: 100vw;
+            margin-left: -5px;
+            margin-right: -5px;
+            padding-left: 5px;
+            padding-right: 5px;
+        }
+        
+        /* 为滑动容器添加自定义滚动条样式 */
+        #hand-0.mobile-slider::-webkit-scrollbar {
+            height: 6px;
+        }
+        
+        #hand-0.mobile-slider::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+        }
+        
+        #hand-0.mobile-slider::-webkit-scrollbar-thumb {
+            background: #ffd66b;
+            border-radius: 3px;
+        }
+        
+        /* 优化手机端触摸区域 */
         .tile {
             width: var(--player-tile-w);
             height: var(--player-tile-h);
@@ -220,6 +261,11 @@
             cursor: pointer;
             position: relative;
             user-select: none;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+            flex-shrink: 0;
+            margin: 0 2px;
+            scroll-snap-align: start;
         }
         
         .tile:hover {
@@ -431,6 +477,7 @@
             font-size: 14px;
             user-select: none;
             touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
         }
         
         button:hover {
@@ -482,6 +529,7 @@
             border-radius: 10px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
             margin-top: 15px;
+            width: 100%;
         }
         
         .log {
@@ -499,6 +547,7 @@
             line-height: 1.3;
         }
         
+        /* 优化牌墙显示 */
         .pile {
             display: flex;
             flex-wrap: wrap;
@@ -528,6 +577,7 @@
             left: 50%;
             transform: translateX(-50%);
             flex-direction: column;
+            width: 90%;
         }
         
         .seat.left {
@@ -826,16 +876,18 @@
         
         /* 手机端响应式设计 */
         @media (max-width: 768px) {
+            /* 南玩家（自己）的手牌尺寸 */
             :root {
-                --player-tile-w: 40px;
-                --player-tile-h: 58px;
-                --ai-tile-w: 30px;
-                --ai-tile-h: 44px;
-                --discard-tile-w: 28px;
-                --discard-tile-h: 42px;
-                --meld-tile-w: 24px;
-                --meld-tile-h: 36px;
-                --gap: 4px;
+                --player-tile-w: 36px;
+                --player-tile-h: 52px;
+                /* 其他玩家的手牌尺寸进一步缩小 */
+                --ai-tile-w: 24px;
+                --ai-tile-h: 35px;
+                --discard-tile-w: 22px;
+                --discard-tile-h: 32px;
+                --meld-tile-w: 20px;
+                --meld-tile-h: 28px;
+                --gap: 2px;
             }
             
             body {
@@ -861,8 +913,8 @@
             }
             
             .table {
-                height: 600px;
-                padding: 15px;
+                height: 550px;
+                padding: 15px 10px 85px 10px; /* 底部增加内边距为南玩家腾空间 */
             }
             
             .table-container {
@@ -870,19 +922,20 @@
             }
             
             .seat.top {
-                top: 15px;
+                top: 10px;
             }
             
             .seat.bottom {
-                bottom: 15px;
+                bottom: 10px;
+                width: 95%;
             }
             
             .seat.left {
-                left: 15px;
+                left: 10px;
             }
             
             .seat.right {
-                right: 15px;
+                right: 10px;
             }
             
             .seat div:first-child {
@@ -890,32 +943,37 @@
             }
             
             .center h4 {
-                font-size: 12px;
+                font-size: 11px;
+            }
+            
+            .center {
+                transform: translate(-50%, -50%) scale(0.8);
             }
             
             #melds-0 {
-                bottom: 80px;
-                right: 30px;
+                bottom: 60px;
+                right: 20px;
             }
             
             #melds-1 {
-                top: 30px;
-                right: 80px;
+                top: 20px;
+                right: 60px;
             }
             
             #melds-2 {
-                top: 80px;
-                left: 30px;
+                top: 60px;
+                left: 20px;
             }
             
             #melds-3 {
-                bottom: 30px;
-                left: 80px;
+                bottom: 20px;
+                left: 60px;
             }
             
             .info-section {
                 min-width: unset;
                 max-width: unset;
+                width: 100%;
             }
             
             .tingpai-panel {
@@ -943,13 +1001,21 @@
                 font-size: 12px;
             }
             
+            /* 规则按钮宽度适配 - 改为屏幕宽度的一半左右 */
             .rules-btn {
-                padding: 8px;
-                font-size: 14px;
+                padding: 12px 10px;
+                font-size: 15px;
+                margin-bottom: 12px;
+                border-radius: 8px;
+                width: 50%; /* 改为50%宽度 */
+                margin-left: auto;
+                margin-right: auto;
+                display: block;
             }
             
             .scoreboard {
                 padding: 10px;
+                width: 100%;
             }
             
             .player-box {
@@ -959,6 +1025,7 @@
             
             .info-panel {
                 padding: 8px;
+                width: 100%;
             }
             
             .controls {
@@ -1091,41 +1158,105 @@
             .dev-info {
                 font-size: 10px;
             }
+            
+            /* 手机端南玩家手牌滑动浏览样式优化 */
+            #hand-0.mobile-slider {
+                display: flex;
+                flex-direction: row;
+                width: 100%;
+                overflow-x: auto;
+                overflow-y: hidden;
+                padding: 8px 0 15px 0;
+                justify-content: flex-start;
+                scroll-snap-type: x mandatory;
+                -webkit-overflow-scrolling: touch;
+                position: relative;
+                scrollbar-width: thin;
+                scrollbar-color: #ffd66b rgba(255, 255, 255, 0.1);
+                /* 确保手牌区域可以完全滚动 */
+                max-width: 100vw;
+                margin-left: -5px;
+                margin-right: -5px;
+                padding-left: 5px;
+                padding-right: 5px;
+            }
+            
+            /* 为滑动容器添加自定义滚动条样式 */
+            #hand-0.mobile-slider::-webkit-scrollbar {
+                height: 6px;
+            }
+            
+            #hand-0.mobile-slider::-webkit-scrollbar-track {
+                background: rgba(255, 255, 255, 0.1);
+                border-radius: 3px;
+            }
+            
+            #hand-0.mobile-slider::-webkit-scrollbar-thumb {
+                background: #ffd66b;
+                border-radius: 3px;
+            }
+            
+            /* 优化手机端触摸区域 */
+            .tile {
+                min-width: var(--player-tile-w);
+                min-height: var(--player-tile-h);
+                flex-shrink: 0;
+                margin: 0 1px;
+                scroll-snap-align: start;
+            }
+            
+            /* 添加滑动提示 */
+            #hand-0.mobile-slider::after {
+                content: "← 滑动浏览所有手牌 →";
+                position: absolute;
+                bottom: 0;
+                left: 50%;
+                transform: translateX(-50%);
+                font-size: 10px;
+                color: #ffd66b;
+                white-space: nowrap;
+                background: rgba(0, 0, 0, 0.7);
+                padding: 2px 8px;
+                border-radius: 10px;
+                pointer-events: none;
+            }
         }
         
         /* 超小屏幕手机优化 */
         @media (max-width: 480px) {
+            /* 南玩家（自己）的手牌尺寸进一步缩小 */
             :root {
-                --player-tile-w: 36px;
-                --player-tile-h: 52px;
-                --ai-tile-w: 26px;
-                --ai-tile-h: 38px;
-                --discard-tile-w: 24px;
-                --discard-tile-h: 36px;
-                --meld-tile-w: 20px;
-                --meld-tile-h: 30px;
-                --gap: 3px;
+                --player-tile-w: 32px;
+                --player-tile-h: 47px;
+                /* 其他玩家的手牌尺寸进一步缩小 */
+                --ai-tile-w: 22px;
+                --ai-tile-h: 32px;
+                --discard-tile-w: 20px;
+                --discard-tile-h: 29px;
+                --meld-tile-w: 18px;
+                --meld-tile-h: 26px;
+                --gap: 1px;
             }
             
             .table {
                 height: 500px;
-                padding: 10px;
+                padding-bottom: 80px;
             }
             
             .seat.top {
-                top: 10px;
+                top: 5px;
             }
             
             .seat.bottom {
-                bottom: 10px;
+                bottom: 5px;
             }
             
             .seat.left {
-                left: 10px;
+                left: 5px;
             }
             
             .seat.right {
-                right: 10px;
+                right: 5px;
             }
             
             .seat div:first-child {
@@ -1133,23 +1264,23 @@
             }
             
             #melds-0 {
-                bottom: 60px;
-                right: 20px;
+                bottom: 50px;
+                right: 15px;
             }
             
             #melds-1 {
-                top: 20px;
-                right: 60px;
+                top: 15px;
+                right: 50px;
             }
             
             #melds-2 {
-                top: 60px;
-                left: 20px;
+                top: 50px;
+                left: 15px;
             }
             
             #melds-3 {
-                bottom: 20px;
-                left: 60px;
+                bottom: 15px;
+                left: 50px;
             }
             
             .tingpai-tile {
@@ -1169,6 +1300,14 @@
                 font-size: 10px;
             }
             
+            /* 超小屏幕下规则按钮宽度调整为60% */
+            .rules-btn {
+                padding: 10px 8px;
+                font-size: 14px;
+                margin-bottom: 10px;
+                width: 60%; /* 超小屏幕下稍微宽一点 */
+            }
+            
             .controls {
                 flex-direction: column;
                 align-items: center;
@@ -1177,6 +1316,41 @@
             button {
                 width: 100%;
                 max-width: 200px;
+            }
+            
+            /* 进一步调整南玩家手牌字体大小 */
+            .tile .num {
+                font-size: 12px;
+            }
+            
+            .tile .suit {
+                font-size: 8px;
+            }
+            
+            .tile.honor {
+                font-size: 14px;
+            }
+            
+            /* 进一步调整其他玩家手牌字体大小 */
+            .ai-tile .num {
+                font-size: 8px;
+            }
+            
+            .ai-tile .suit {
+                font-size: 6px;
+            }
+            
+            .ai-tile.honor {
+                font-size: 10px;
+            }
+            
+            /* 手机端南玩家手牌滑动浏览样式优化 */
+            #hand-0.mobile-slider {
+                padding: 6px 0 12px 0;
+            }
+            
+            #hand-0.mobile-slider::after {
+                font-size: 9px;
             }
         }
         
@@ -1188,11 +1362,61 @@
             
             .table {
                 height: 400px;
+                padding-bottom: 70px;
             }
             
             .info-section {
                 max-width: 250px;
             }
+            
+            /* 横屏时稍微增大手牌尺寸 */
+            :root {
+                --player-tile-w: 36px;
+                --player-tile-h: 52px;
+                --ai-tile-w: 28px;
+                --ai-tile-h: 40px;
+            }
+            
+            /* 横屏时规则按钮宽度调整 */
+            .rules-btn {
+                width: 80%; /* 横屏时稍微宽一点 */
+            }
+            
+            /* 横屏时南玩家手牌滑动浏览优化 */
+            #hand-0.mobile-slider {
+                max-height: 80px;
+                padding: 5px 0 10px 0;
+            }
+            
+            #hand-0.mobile-slider::after {
+                font-size: 9px;
+            }
+        }
+        
+        /* 小屏幕平板优化 */
+        @media (max-width: 1024px) and (min-width: 769px) {
+            .table {
+                height: 700px;
+            }
+            
+            :root {
+                --player-tile-w: 44px;
+                --player-tile-h: 64px;
+                --ai-tile-w: 32px;
+                --ai-tile-h: 46px;
+            }
+            
+            .rules-btn {
+                width: 100%;
+                padding: 12px 15px;
+                font-size: 16px;
+            }
+        }
+        
+        /* 桌面端也确保规则按钮宽度一致 */
+        .rules-btn {
+            width: 100%;
+            box-sizing: border-box;
         }
     </style>
 </head>
@@ -1321,6 +1545,9 @@
     </div>
 
     <script>
+        // 检测是否为移动设备
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        
         const PLAYER_NAMES = ['南（你）', '东', '北', '西'];
         const WIN_SCORE = 10;
         const REACTION_TIME = 10000;
@@ -1524,7 +1751,98 @@
             return false;
         }
         
-        // 添加触摸事件支持
+        function canFormMeldGroupsWithRedDragon(counts, redDragons, n) {
+            if (Object.keys(counts).length === 0 && redDragons === 0) return true;
+            
+            if (n === 0) return Object.keys(counts).length === 0 && redDragons === 0;
+            
+            const keys = Object.keys(counts);
+            
+            if (keys.length === 0) {
+                if (redDragons >= 3) {
+                    return canFormMeldGroupsWithRedDragon(counts, redDragons - 3, n - 1);
+                }
+                return false;
+            }
+            
+            const firstKey = keys[0];
+            
+            const suit = firstKey[0];
+            const rank = parseInt(firstKey.slice(1));
+            
+            if (counts[firstKey] >= 3) {
+                const newCounts = {...counts};
+                newCounts[firstKey] -= 3;
+                if (newCounts[firstKey] === 0) delete newCounts[firstKey];
+                
+                if (canFormMeldGroupsWithRedDragon(newCounts, redDragons, n - 1)) {
+                    return true;
+                }
+            }
+            
+            if (counts[firstKey] + redDragons >= 3) {
+                const needRedDragons = Math.max(0, 3 - counts[firstKey]);
+                const newCounts = {...counts};
+                delete newCounts[firstKey];
+                
+                if (canFormMeldGroupsWithRedDragon(newCounts, redDragons - needRedDragons, n - 1)) {
+                    return true;
+                }
+            }
+            
+            if (suit !== 'z' && rank <= 7) {
+                const next1 = `${suit}${rank + 1}`;
+                const next2 = `${suit}${rank + 2}`;
+                
+                const count1 = counts[next1] || 0;
+                const count2 = counts[next2] || 0;
+                
+                if (counts[firstKey] > 0 && count1 > 0 && count2 > 0) {
+                    const newCounts = {...counts};
+                    newCounts[firstKey] -= 1;
+                    newCounts[next1] -= 1;
+                    newCounts[next2] -= 1;
+                    
+                    for (const key of [firstKey, next1, next2]) {
+                        if (newCounts[key] === 0) delete newCounts[key];
+                    }
+                    
+                    if (canFormMeldGroupsWithRedDragon(newCounts, redDragons, n - 1)) {
+                        return true;
+                    }
+                }
+                
+                let missing = 0;
+                if (counts[firstKey] === 0) missing++;
+                if (count1 === 0) missing++;
+                if (count2 === 0) missing++;
+                
+                if (redDragons >= missing) {
+                    const newCounts = {...counts};
+                    
+                    if (counts[firstKey] > 0) {
+                        newCounts[firstKey] -= 1;
+                        if (newCounts[firstKey] === 0) delete newCounts[firstKey];
+                    }
+                    if (count1 > 0) {
+                        newCounts[next1] -= 1;
+                        if (newCounts[next1] === 0) delete newCounts[next1];
+                    }
+                    if (count2 > 0) {
+                        newCounts[next2] -= 1;
+                        if (newCounts[next2] === 0) delete newCounts[next2];
+                    }
+                    
+                    if (canFormMeldGroupsWithRedDragon(newCounts, redDragons - missing, n - 1)) {
+                        return true;
+                    }
+                }
+            }
+            
+            return false;
+        }
+        
+        // 优化手机端触摸事件处理
         function addTouchSupport() {
             // 为麻将牌添加触摸事件
             document.addEventListener('touchstart', function(e) {
@@ -1534,6 +1852,13 @@
                     state.currentPlayer === 0 && 
                     state.waitingForDiscard) {
                     e.preventDefault();
+                    
+                    // 模拟点击事件
+                    if (e.target.click) {
+                        e.target.click();
+                    } else if (e.target.parentNode.click) {
+                        e.target.parentNode.click();
+                    }
                 }
             }, { passive: false });
             
@@ -1549,6 +1874,24 @@
                     e.target.style.transform = '';
                 }
             });
+            
+            // 增加触摸区域，提高灵敏度
+            if (isMobile) {
+                document.addEventListener('touchstart', function(e) {
+                    const tile = e.target.closest('.tile');
+                    if (tile && !tile.classList.contains('back') && 
+                        state.currentPlayer === 0 && state.waitingForDiscard) {
+                        tile.style.transform = 'translateY(-8px)';
+                    }
+                });
+                
+                document.addEventListener('touchend', function(e) {
+                    const tile = e.target.closest('.tile');
+                    if (tile && !tile.classList.contains('back')) {
+                        tile.style.transform = '';
+                    }
+                });
+            }
         }
         
         function initDevPanelDrag() {
@@ -1723,7 +2066,15 @@
                 }
             }
             
-            if (opts.click) el.addEventListener('click', opts.click);
+            // 优化触摸事件处理
+            if (opts.click) {
+                el.addEventListener('click', opts.click);
+                // 添加触摸事件支持
+                el.addEventListener('touchend', function(e) {
+                    e.preventDefault();
+                    opts.click();
+                });
+            }
             
             return el;
         }
@@ -2108,6 +2459,7 @@
         function renderDiscards() {
             const el = document.getElementById('discards');
             el.innerHTML = '';
+            
             for (const t of state.discards) {
                 el.appendChild(renderDiscardTile(t));
             }
@@ -2148,11 +2500,16 @@
                 el.innerHTML = '';
                 const isPlayer = (i === 0);
                 
-                for (let j = 0; j < state.hands[i].length; j++) {
-                    const tile = state.hands[i][j];
-                    let clickHandler;
+                // 如果是南玩家（玩家自己）且在手机端，使用滑动布局
+                if (isPlayer && isMobile) {
+                    el.classList.add('mobile-slider');
                     
-                    if (isPlayer) {
+                    const hand = state.hands[i];
+                    
+                    for (let j = 0; j < hand.length; j++) {
+                        const tile = hand[j];
+                        let clickHandler;
+                        
                         if (state.devMode) {
                             clickHandler = () => {
                                 if (state.devMode) {
@@ -2160,7 +2517,7 @@
                                     state.wall.push(removedTile);
                                     renderAll();
                                     checkWinCondition(0);
-                                    checkTingPai(); // 检查听牌状态
+                                    checkTingPai();
                                     log(`开发者模式：移除 ${tileToChinese(tile)} 并放回牌库`);
                                 } else {
                                     onPlayerTileClick(j);
@@ -2169,12 +2526,42 @@
                         } else {
                             clickHandler = () => onPlayerTileClick(j);
                         }
+                        
+                        const node = renderTile(tile, {click: clickHandler});
+                        el.appendChild(node);
                     }
+                } else {
+                    // 非手机端或其他玩家的手牌保持原样
+                    el.classList.remove('mobile-slider');
                     
-                    const node = isPlayer ? 
-                        renderTile(tile, {click: clickHandler}) : 
-                        renderTile(tile, {back: true, aiPlayer: true});
-                    el.appendChild(node);
+                    for (let j = 0; j < state.hands[i].length; j++) {
+                        const tile = state.hands[i][j];
+                        let clickHandler;
+                        
+                        if (isPlayer) {
+                            if (state.devMode) {
+                                clickHandler = () => {
+                                    if (state.devMode) {
+                                        const removedTile = state.hands[0].splice(j, 1)[0];
+                                        state.wall.push(removedTile);
+                                        renderAll();
+                                        checkWinCondition(0);
+                                        checkTingPai();
+                                        log(`开发者模式：移除 ${tileToChinese(tile)} 并放回牌库`);
+                                    } else {
+                                        onPlayerTileClick(j);
+                                    }
+                                };
+                            } else {
+                                clickHandler = () => onPlayerTileClick(j);
+                            }
+                        }
+                        
+                        const node = isPlayer ? 
+                            renderTile(tile, {click: clickHandler}) : 
+                            renderTile(tile, {back: true, aiPlayer: true});
+                        el.appendChild(node);
+                    }
                 }
             }
             
@@ -2588,97 +2975,6 @@
             if (redDragons >= 2) {
                 if (canFormMeldGroupsWithRedDragon(counts, redDragons - 2, n)) {
                     return true;
-                }
-            }
-            
-            return false;
-        }
-        
-        function canFormMeldGroupsWithRedDragon(counts, redDragons, n) {
-            if (Object.keys(counts).length === 0 && redDragons === 0) return true;
-            
-            if (n === 0) return Object.keys(counts).length === 0 && redDragons === 0;
-            
-            const keys = Object.keys(counts);
-            
-            if (keys.length === 0) {
-                if (redDragons >= 3) {
-                    return canFormMeldGroupsWithRedDragon(counts, redDragons - 3, n - 1);
-                }
-                return false;
-            }
-            
-            const firstKey = keys[0];
-            
-            const suit = firstKey[0];
-            const rank = parseInt(firstKey.slice(1));
-            
-            if (counts[firstKey] >= 3) {
-                const newCounts = {...counts};
-                newCounts[firstKey] -= 3;
-                if (newCounts[firstKey] === 0) delete newCounts[firstKey];
-                
-                if (canFormMeldGroupsWithRedDragon(newCounts, redDragons, n - 1)) {
-                    return true;
-                }
-            }
-            
-            if (counts[firstKey] + redDragons >= 3) {
-                const needRedDragons = Math.max(0, 3 - counts[firstKey]);
-                const newCounts = {...counts};
-                delete newCounts[firstKey];
-                
-                if (canFormMeldGroupsWithRedDragon(newCounts, redDragons - needRedDragons, n - 1)) {
-                    return true;
-                }
-            }
-            
-            if (suit !== 'z' && rank <= 7) {
-                const next1 = `${suit}${rank + 1}`;
-                const next2 = `${suit}${rank + 2}`;
-                
-                const count1 = counts[next1] || 0;
-                const count2 = counts[next2] || 0;
-                
-                if (counts[firstKey] > 0 && count1 > 0 && count2 > 0) {
-                    const newCounts = {...counts};
-                    newCounts[firstKey] -= 1;
-                    newCounts[next1] -= 1;
-                    newCounts[next2] -= 1;
-                    
-                    for (const key of [firstKey, next1, next2]) {
-                        if (newCounts[key] === 0) delete newCounts[key];
-                    }
-                    
-                    if (canFormMeldGroupsWithRedDragon(newCounts, redDragons, n - 1)) {
-                        return true;
-                    }
-                }
-                
-                let missing = 0;
-                if (counts[firstKey] === 0) missing++;
-                if (count1 === 0) missing++;
-                if (count2 === 0) missing++;
-                
-                if (redDragons >= missing) {
-                    const newCounts = {...counts};
-                    
-                    if (counts[firstKey] > 0) {
-                        newCounts[firstKey] -= 1;
-                        if (newCounts[firstKey] === 0) delete newCounts[firstKey];
-                    }
-                    if (count1 > 0) {
-                        newCounts[next1] -= 1;
-                        if (newCounts[next1] === 0) delete newCounts[next1];
-                    }
-                    if (count2 > 0) {
-                        newCounts[next2] -= 1;
-                        if (newCounts[next2] === 0) delete newCounts[next2];
-                    }
-                    
-                    if (canFormMeldGroupsWithRedDragon(newCounts, redDragons - missing, n - 1)) {
-                        return true;
-                    }
                 }
             }
             
