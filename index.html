@@ -214,7 +214,7 @@
             width: 100%;
             overflow-x: auto;
             overflow-y: hidden;
-            padding: 8px 0 15px 0;
+            padding: 8px 0 25px 0; /* 增加底部内边距为滚动条提供更多空间 */
             justify-content: flex-start;
             scroll-snap-type: x mandatory;
             -webkit-overflow-scrolling: touch;
@@ -227,21 +227,37 @@
             margin-right: -5px;
             padding-left: 5px;
             padding-right: 5px;
+            /* 修复滑动问题的关键属性 */
+            touch-action: pan-x;
+            overscroll-behavior-x: contain;
+            -webkit-user-select: none;
+            user-select: none;
+            /* 确保容器有足够空间 */
+            min-height: calc(var(--player-tile-h) + 25px);
         }
         
-        /* 为滑动容器添加自定义滚动条样式 */
+        /* 为滑动容器添加自定义滚动条样式 - 修改滑块大小 */
         #hand-0.mobile-slider::-webkit-scrollbar {
-            height: 6px;
+            height: 16px; /* 从8px增加到16px，增加触摸区域 */
         }
         
         #hand-0.mobile-slider::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 3px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 8px; /* 增加圆角 */
+            margin: 0 10px; /* 增加左右边距，让滚动条更宽 */
         }
         
         #hand-0.mobile-slider::-webkit-scrollbar-thumb {
             background: #ffd66b;
-            border-radius: 3px;
+            border-radius: 8px; /* 增加圆角 */
+            border: 2px solid rgba(0, 0, 0, 0.2); /* 增加边框，让滑块更明显 */
+            min-height: 20px; /* 确保滑块最小高度 */
+        }
+        
+        /* 为滑块添加悬停效果，提高可见性 */
+        #hand-0.mobile-slider::-webkit-scrollbar-thumb:hover {
+            background: #ffc83d;
+            border: 2px solid rgba(0, 0, 0, 0.3);
         }
         
         /* 优化手机端触摸区域 */
@@ -266,6 +282,8 @@
             flex-shrink: 0;
             margin: 0 2px;
             scroll-snap-align: start;
+            /* 确保麻将牌不会阻止触摸事件 */
+            pointer-events: auto;
         }
         
         .tile:hover {
@@ -303,6 +321,39 @@
         .tile.new-draw {
             box-shadow: 0 0 0 3px #ff6b6b, 0 0 10px 3px rgba(255, 107, 107, 0.5);
             animation: pulse 1.5s infinite alternate;
+        }
+        
+        /* 手机端防误触选中状态 */
+        .tile.selected {
+            box-shadow: 0 0 0 3px #ffd66b, 0 0 15px 5px rgba(255, 214, 107, 0.7);
+            transform: translateY(-10px);
+            z-index: 10;
+        }
+        
+        /* 手机端防误触确认提示 */
+        .tile.confirm-prompt {
+            position: relative;
+        }
+        
+        .tile.confirm-prompt::after {
+            content: "再次点击出牌";
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: #ffd66b;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            white-space: nowrap;
+            z-index: 20;
+            animation: fadeInOut 2s infinite;
+        }
+        
+        @keyframes fadeInOut {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 1; }
         }
         
         @keyframes pulse {
@@ -1159,41 +1210,37 @@
                 font-size: 10px;
             }
             
-            /* 手机端南玩家手牌滑动浏览样式优化 */
-            #hand-0.mobile-slider {
-                display: flex;
-                flex-direction: row;
-                width: 100%;
-                overflow-x: auto;
-                overflow-y: hidden;
-                padding: 8px 0 15px 0;
-                justify-content: flex-start;
-                scroll-snap-type: x mandatory;
-                -webkit-overflow-scrolling: touch;
-                position: relative;
-                scrollbar-width: thin;
-                scrollbar-color: #ffd66b rgba(255, 255, 255, 0.1);
-                /* 确保手牌区域可以完全滚动 */
-                max-width: 100vw;
-                margin-left: -5px;
-                margin-right: -5px;
-                padding-left: 5px;
-                padding-right: 5px;
+            /* 添加滑动指示器动画 */
+            .scroll-indicator {
+                position: absolute;
+                right: 10px;
+                top: 50%;
+                transform: translateY(-50%);
+                width: 20px;
+                height: 20px;
+                background: rgba(255, 214, 107, 0.7);
+                border-radius: 50%;
+                pointer-events: none;
+                z-index: 10;
+                animation: bounce 2s infinite;
+                display: none;
             }
             
-            /* 为滑动容器添加自定义滚动条样式 */
-            #hand-0.mobile-slider::-webkit-scrollbar {
-                height: 6px;
+            @keyframes bounce {
+                0%, 20%, 50%, 80%, 100% {
+                    transform: translateY(-50%);
+                }
+                40% {
+                    transform: translateY(-60%);
+                }
+                60% {
+                    transform: translateY(-40%);
+                }
             }
             
-            #hand-0.mobile-slider::-webkit-scrollbar-track {
-                background: rgba(255, 255, 255, 0.1);
-                border-radius: 3px;
-            }
-            
-            #hand-0.mobile-slider::-webkit-scrollbar-thumb {
-                background: #ffd66b;
-                border-radius: 3px;
+            /* 当手牌可以滚动时显示指示器 */
+            #hand-0.mobile-slider.scrollable .scroll-indicator {
+                display: block;
             }
             
             /* 优化手机端触摸区域 */
@@ -1203,6 +1250,8 @@
                 flex-shrink: 0;
                 margin: 0 1px;
                 scroll-snap-align: start;
+                /* 确保麻将牌不会阻止触摸事件 */
+                pointer-events: auto;
             }
             
             /* 添加滑动提示 */
@@ -1219,6 +1268,31 @@
                 padding: 2px 8px;
                 border-radius: 10px;
                 pointer-events: none;
+                z-index: 10;
+            }
+            
+            /* 手机端防误触选中状态 */
+            .tile.selected {
+                box-shadow: 0 0 0 3px #ffd66b, 0 0 15px 5px rgba(255, 214, 107, 0.7);
+                transform: translateY(-8px);
+                z-index: 10;
+            }
+            
+            /* 手机端防误触确认提示 */
+            .tile.confirm-prompt::after {
+                content: "再次点击出牌";
+                position: absolute;
+                top: -25px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: rgba(0, 0, 0, 0.8);
+                color: #ffd66b;
+                padding: 3px 6px;
+                border-radius: 4px;
+                font-size: 9px;
+                white-space: nowrap;
+                z-index: 20;
+                animation: fadeInOut 2s infinite;
             }
         }
         
@@ -1346,11 +1420,32 @@
             
             /* 手机端南玩家手牌滑动浏览样式优化 */
             #hand-0.mobile-slider {
-                padding: 6px 0 12px 0;
+                padding: 6px 0 22px 0; /* 增加底部内边距 */
             }
             
             #hand-0.mobile-slider::after {
                 font-size: 9px;
+            }
+            
+            /* 手机端防误触选中状态 */
+            .tile.selected {
+                transform: translateY(-6px);
+            }
+            
+            /* 手机端防误触确认提示 */
+            .tile.confirm-prompt::after {
+                top: -22px;
+                font-size: 8px;
+                padding: 2px 4px;
+            }
+            
+            /* 超小屏幕滚动条调整 */
+            #hand-0.mobile-slider::-webkit-scrollbar {
+                height: 14px; /* 在超小屏幕上保持足够高度 */
+            }
+            
+            #hand-0.mobile-slider::-webkit-scrollbar-track {
+                margin: 0 8px; /* 调整边距 */
             }
         }
         
@@ -1385,11 +1480,16 @@
             /* 横屏时南玩家手牌滑动浏览优化 */
             #hand-0.mobile-slider {
                 max-height: 80px;
-                padding: 5px 0 10px 0;
+                padding: 5px 0 20px 0;
             }
             
             #hand-0.mobile-slider::after {
                 font-size: 9px;
+            }
+            
+            /* 横屏手机滚动条调整 */
+            #hand-0.mobile-slider::-webkit-scrollbar {
+                height: 12px; /* 横屏时稍微减小高度 */
             }
         }
         
@@ -1583,7 +1683,10 @@
             winPromptTimer: null,
             devMode: false,
             redDragonWildcard: true,
-            tingPaiTiles: [] // 新增：听牌列表
+            tingPaiTiles: [], // 新增：听牌列表
+            // 手机端防误触状态
+            mobileSelectedTileIndex: -1, // 选中的麻将牌索引
+            isConfirmingDiscard: false   // 是否处于确认出牌状态
         };
         
         const logEl = document.getElementById('log');
@@ -1842,25 +1945,72 @@
             return false;
         }
         
-        // 优化手机端触摸事件处理
+        // 优化手机端触摸事件处理 - 修复版
         function addTouchSupport() {
-            // 为麻将牌添加触摸事件
-            document.addEventListener('touchstart', function(e) {
-                // 防止触摸时页面滚动
-                if (e.target.classList.contains('tile') && 
-                    !e.target.classList.contains('back') && 
-                    state.currentPlayer === 0 && 
-                    state.waitingForDiscard) {
-                    e.preventDefault();
-                    
-                    // 模拟点击事件
-                    if (e.target.click) {
-                        e.target.click();
-                    } else if (e.target.parentNode.click) {
-                        e.target.parentNode.click();
+            if (!isMobile) return;
+            
+            let startX, startY;
+            let isScrolling = false;
+            const handContainer = document.getElementById('hand-0');
+            
+            // 添加滑动指示器元素
+            const scrollIndicator = document.createElement('div');
+            scrollIndicator.className = 'scroll-indicator';
+            handContainer.appendChild(scrollIndicator);
+            
+            // 检查是否需要显示滚动指示器
+            function checkScrollable() {
+                if (handContainer.scrollWidth > handContainer.clientWidth) {
+                    handContainer.classList.add('scrollable');
+                } else {
+                    handContainer.classList.remove('scrollable');
+                }
+            }
+            
+            // 初始检查和定期检查
+            checkScrollable();
+            window.addEventListener('resize', checkScrollable);
+            
+            // 触摸开始事件
+            handContainer.addEventListener('touchstart', function(e) {
+                startX = e.touches[0].pageX;
+                startY = e.touches[0].pageY;
+                isScrolling = false;
+            }, { passive: true });
+            
+            // 触摸移动事件 - 区分滑动和点击
+            handContainer.addEventListener('touchmove', function(e) {
+                if (!startX || !startY) return;
+                
+                const xDiff = startX - e.touches[0].pageX;
+                const yDiff = startY - e.touches[0].pageY;
+                
+                // 如果是水平滑动，允许滚动
+                if (Math.abs(xDiff) > Math.abs(yDiff)) {
+                    isScrolling = true;
+                }
+            }, { passive: true });
+            
+            // 触摸结束事件
+            handContainer.addEventListener('touchend', function(e) {
+                if (!isScrolling) {
+                    // 如果是点击而非滑动，处理麻将牌点击
+                    const tile = e.target.closest('.tile');
+                    if (tile && !tile.classList.contains('back') && 
+                        state.currentPlayer === 0 && state.waitingForDiscard) {
+                        // 找到被点击的麻将牌的索引
+                        const tiles = Array.from(handContainer.querySelectorAll('.tile'));
+                        const index = tiles.indexOf(tile);
+                        if (index !== -1) {
+                            onPlayerTileClick(index);
+                        }
                     }
                 }
-            }, { passive: false });
+                
+                startX = null;
+                startY = null;
+                isScrolling = false;
+            }, { passive: true });
             
             // 为按钮添加触摸事件
             document.addEventListener('touchstart', function(e) {
@@ -1874,24 +2024,6 @@
                     e.target.style.transform = '';
                 }
             });
-            
-            // 增加触摸区域，提高灵敏度
-            if (isMobile) {
-                document.addEventListener('touchstart', function(e) {
-                    const tile = e.target.closest('.tile');
-                    if (tile && !tile.classList.contains('back') && 
-                        state.currentPlayer === 0 && state.waitingForDiscard) {
-                        tile.style.transform = 'translateY(-8px)';
-                    }
-                });
-                
-                document.addEventListener('touchend', function(e) {
-                    const tile = e.target.closest('.tile');
-                    if (tile && !tile.classList.contains('back')) {
-                        tile.style.transform = '';
-                    }
-                });
-            }
         }
         
         function initDevPanelDrag() {
@@ -2046,6 +2178,14 @@
             
             if (state.devMode && !opts.aiPlayer && !opts.back) {
                 el.classList.add('dev-removable');
+            }
+            
+            // 手机端防误触选中状态
+            if (isMobile && !opts.aiPlayer && !opts.back && opts.index === state.mobileSelectedTileIndex) {
+                el.classList.add('selected');
+                if (state.isConfirmingDiscard) {
+                    el.classList.add('confirm-prompt');
+                }
             }
             
             if (!opts.back) {
@@ -2385,6 +2525,9 @@
             state.skipPengGang = false;
             state.newDrawTileId = null;
             state.tingPaiTiles = []; // 重置听牌列表
+            // 手机端防误触状态重置
+            state.mobileSelectedTileIndex = -1;
+            state.isConfirmingDiscard = false;
             
             if (state.reactionTimer) {
                 clearTimeout(state.reactionTimer);
@@ -2527,9 +2670,18 @@
                             clickHandler = () => onPlayerTileClick(j);
                         }
                         
-                        const node = renderTile(tile, {click: clickHandler});
+                        const node = renderTile(tile, {click: clickHandler, index: j});
                         el.appendChild(node);
                     }
+                    
+                    // 检查是否需要滚动
+                    setTimeout(() => {
+                        if (el.scrollWidth > el.clientWidth) {
+                            el.classList.add('scrollable');
+                        } else {
+                            el.classList.remove('scrollable');
+                        }
+                    }, 100);
                 } else {
                     // 非手机端或其他玩家的手牌保持原样
                     el.classList.remove('mobile-slider');
@@ -2558,7 +2710,7 @@
                         }
                         
                         const node = isPlayer ? 
-                            renderTile(tile, {click: clickHandler}) : 
+                            renderTile(tile, {click: clickHandler, index: j}) : 
                             renderTile(tile, {back: true, aiPlayer: true});
                         el.appendChild(node);
                     }
@@ -2604,23 +2756,70 @@
                 return;
             }
             
-            const t = state.hands[0].splice(index, 1)[0];
-            state.discards.push(t);
-            state.lastDiscard = t;
-            state.lastDiscardPlayer = 0;
-            state.waitingForDiscard = false;
-            
-            state.newDrawTileId = null;
-            
-            if (state.firstTurn) {
-                state.firstTurn = false;
+            // 手机端防误触设计
+            if (isMobile) {
+                // 如果已经选中了一张牌并且是同一张牌，则出牌
+                if (state.mobileSelectedTileIndex === index && state.isConfirmingDiscard) {
+                    const t = state.hands[0].splice(index, 1)[0];
+                    state.discards.push(t);
+                    state.lastDiscard = t;
+                    state.lastDiscardPlayer = 0;
+                    state.waitingForDiscard = false;
+                    
+                    state.newDrawTileId = null;
+                    state.mobileSelectedTileIndex = -1;
+                    state.isConfirmingDiscard = false;
+                    
+                    if (state.firstTurn) {
+                        state.firstTurn = false;
+                    }
+                    
+                    log('你打出：' + tileToChinese(t));
+                    renderAll();
+                    checkTingPai(); // 检查听牌状态
+                    
+                    processPendingActions();
+                } 
+                // 如果已经选中了一张牌但是点击了不同的牌，则切换选中
+                else if (state.mobileSelectedTileIndex !== -1 && state.mobileSelectedTileIndex !== index) {
+                    state.mobileSelectedTileIndex = index;
+                    state.isConfirmingDiscard = false;
+                    renderAll();
+                    log(`选中 ${tileToChinese(state.hands[0][index])}，请再次点击确认出牌`);
+                }
+                // 如果还没有选中牌，则选中这张牌
+                else if (state.mobileSelectedTileIndex === -1) {
+                    state.mobileSelectedTileIndex = index;
+                    state.isConfirmingDiscard = false;
+                    renderAll();
+                    log(`选中 ${tileToChinese(state.hands[0][index])}，请再次点击确认出牌`);
+                }
+                // 如果已经选中了同一张牌但还没确认，则进入确认状态
+                else if (state.mobileSelectedTileIndex === index && !state.isConfirmingDiscard) {
+                    state.isConfirmingDiscard = true;
+                    renderAll();
+                    log(`确认出牌 ${tileToChinese(state.hands[0][index])}，请再次点击出牌`);
+                }
+            } else {
+                // 非手机端，直接出牌
+                const t = state.hands[0].splice(index, 1)[0];
+                state.discards.push(t);
+                state.lastDiscard = t;
+                state.lastDiscardPlayer = 0;
+                state.waitingForDiscard = false;
+                
+                state.newDrawTileId = null;
+                
+                if (state.firstTurn) {
+                    state.firstTurn = false;
+                }
+                
+                log('你打出：' + tileToChinese(t));
+                renderAll();
+                checkTingPai(); // 检查听牌状态
+                
+                processPendingActions();
             }
-            
-            log('你打出：' + tileToChinese(t));
-            renderAll();
-            checkTingPai(); // 检查听牌状态
-            
-            processPendingActions();
         }
         
         function checkPeng(playerIndex, tile) {
