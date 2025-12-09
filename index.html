@@ -2977,6 +2977,20 @@ Arrange time reasonably, enjoy a healthy life.</p>
             return { canGang: false };
         }
         
+        // 获取AI玩家可丢弃的牌（排除红中）
+        function getDiscardableTilesForAI(hand) {
+            const discardable = [];
+            for (let i = 0; i < hand.length; i++) {
+                const tile = hand[i];
+                // 排除红中
+                if (state.redDragonWildcard && tile.type === 'honor' && tile.rank === 'red') {
+                    continue;
+                }
+                discardable.push(i);
+            }
+            return discardable;
+        }
+        
         function doPeng(playerIndex) {
             const tile = state.lastDiscard;
             const hand = state.hands[playerIndex];
@@ -3014,8 +3028,17 @@ Arrange time reasonably, enjoy a healthy life.</p>
                 log('Please discard a tile');
             } else {
                 setTimeout(() => {
-                    const idx = Math.floor(Math.random() * state.hands[playerIndex].length);
-                    const dt = state.hands[playerIndex].splice(idx, 1)[0];
+                    // AI玩家不能丢红中
+                    const discardableIndices = getDiscardableTilesForAI(state.hands[playerIndex]);
+                    let idx, dt;
+                    if (discardableIndices.length > 0) {
+                        const randomIdx = discardableIndices[Math.floor(Math.random() * discardableIndices.length)];
+                        dt = state.hands[playerIndex].splice(randomIdx, 1)[0];
+                    } else {
+                        // 如果没有可丢弃的牌（只有红中），则丢弃红中
+                        idx = Math.floor(Math.random() * state.hands[playerIndex].length);
+                        dt = state.hands[playerIndex].splice(idx, 1)[0];
+                    }
                     state.discards.push(dt);
                     state.lastDiscard = dt;
                     state.lastDiscardPlayer = playerIndex;
@@ -3081,8 +3104,17 @@ Arrange time reasonably, enjoy a healthy life.</p>
                 log('Please discard a tile');
             } else {
                 setTimeout(() => {
-                    const idx = Math.floor(Math.random() * state.hands[playerIndex].length);
-                    const dt = state.hands[playerIndex].splice(idx, 1)[0];
+                    // AI玩家不能丢红中
+                    const discardableIndices = getDiscardableTilesForAI(state.hands[playerIndex]);
+                    let idx, dt;
+                    if (discardableIndices.length > 0) {
+                        const randomIdx = discardableIndices[Math.floor(Math.random() * discardableIndices.length)];
+                        dt = state.hands[playerIndex].splice(randomIdx, 1)[0];
+                    } else {
+                        // 如果没有可丢弃的牌（只有红中），则丢弃红中
+                        idx = Math.floor(Math.random() * state.hands[playerIndex].length);
+                        dt = state.hands[playerIndex].splice(idx, 1)[0];
+                    }
                     state.discards.push(dt);
                     state.lastDiscard = dt;
                     state.lastDiscardPlayer = playerIndex;
@@ -3162,8 +3194,17 @@ Arrange time reasonably, enjoy a healthy life.</p>
                 log('Please discard a tile');
             } else {
                 setTimeout(() => {
-                    const idx = Math.floor(Math.random() * state.hands[playerIndex].length);
-                    const dt = state.hands[playerIndex].splice(idx, 1)[0];
+                    // AI玩家不能丢红中
+                    const discardableIndices = getDiscardableTilesForAI(state.hands[playerIndex]);
+                    let idx, dt;
+                    if (discardableIndices.length > 0) {
+                        const randomIdx = discardableIndices[Math.floor(Math.random() * discardableIndices.length)];
+                        dt = state.hands[playerIndex].splice(randomIdx, 1)[0];
+                    } else {
+                        // 如果没有可丢弃的牌（只有红中），则丢弃红中
+                        idx = Math.floor(Math.random() * state.hands[playerIndex].length);
+                        dt = state.hands[playerIndex].splice(idx, 1)[0];
+                    }
                     state.discards.push(dt);
                     state.lastDiscard = dt;
                     state.lastDiscardPlayer = playerIndex;
@@ -3409,8 +3450,17 @@ Arrange time reasonably, enjoy a healthy life.</p>
                             return;
                         }
                         
-                        const idx = Math.floor(Math.random() * state.hands[state.currentPlayer].length);
-                        const dt = state.hands[state.currentPlayer].splice(idx, 1)[0];
+                        // AI玩家不能丢红中
+                        const discardableIndices = getDiscardableTilesForAI(state.hands[state.currentPlayer]);
+                        let idx, dt;
+                        if (discardableIndices.length > 0) {
+                            const randomIdx = discardableIndices[Math.floor(Math.random() * discardableIndices.length)];
+                            dt = state.hands[state.currentPlayer].splice(randomIdx, 1)[0];
+                        } else {
+                            // 如果没有可丢弃的牌（只有红中），则丢弃红中
+                            idx = Math.floor(Math.random() * state.hands[state.currentPlayer].length);
+                            dt = state.hands[state.currentPlayer].splice(idx, 1)[0];
+                        }
                         state.discards.push(dt);
                         state.lastDiscard = dt;
                         state.lastDiscardPlayer = state.currentPlayer;
@@ -3505,8 +3555,17 @@ Arrange time reasonably, enjoy a healthy life.</p>
                     return;
                 }
                 
-                const idx = Math.floor(Math.random() * state.hands[state.currentPlayer].length);
-                const dt = state.hands[state.currentPlayer].splice(idx, 1)[0];
+                // AI玩家不能丢红中
+                const discardableIndices = getDiscardableTilesForAI(state.hands[state.currentPlayer]);
+                let idx, dt;
+                if (discardableIndices.length > 0) {
+                    const randomIdx = discardableIndices[Math.floor(Math.random() * discardableIndices.length)];
+                    dt = state.hands[state.currentPlayer].splice(randomIdx, 1)[0];
+                } else {
+                    // 如果没有可丢弃的牌（只有红中），则丢弃红中
+                    idx = Math.floor(Math.random() * state.hands[state.currentPlayer].length);
+                    dt = state.hands[state.currentPlayer].splice(idx, 1)[0];
+                }
                 state.discards.push(dt);
                 state.lastDiscard = dt;
                 state.lastDiscardPlayer = state.currentPlayer;
