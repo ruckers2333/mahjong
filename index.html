@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>广东麻将 - 无不良影响</title>
+    <title>Guangdong Mahjong</title>
     <style>
         :root {
-            --player-tile-w: 52px;
-            --player-tile-h: 76px;
-            --ai-tile-w: 40px;
-            --ai-tile-h: 58px;
-            --discard-tile-w: 38px;
-            --discard-tile-h: 56px;
-            --meld-tile-w: 34px;
-            --meld-tile-h: 48px;
+            --player-tile-w: 48px;
+            --player-tile-h: 70px;
+            --ai-tile-w: 36px;
+            --ai-tile-h: 52px;
+            --discard-tile-w: 34px;
+            --discard-tile-h: 50px;
+            --meld-tile-w: 30px;
+            --meld-tile-h: 42px;
             --gap: 8px;
         }
         
@@ -119,8 +119,8 @@
         }
         
         .tingpai-tile {
-            width: 35px;
-            height: 50px;
+            width: 32px;
+            height: 46px;
             background: #fff;
             border-radius: 3px;
             display: flex;
@@ -130,6 +130,7 @@
             color: #111;
             font-weight: 700;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
         }
         
         .tingpai-tile .num {
@@ -268,11 +269,8 @@
             border-radius: 5px;
             box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
             display: flex;
-            flex-direction: column;
             justify-content: center;
             align-items: center;
-            color: 111;
-            font-weight: 700;
             transition: transform 0.2s;
             cursor: pointer;
             position: relative;
@@ -282,31 +280,37 @@
             flex-shrink: 0;
             margin: 0 2px;
             scroll-snap-align: start;
+            overflow: hidden;
             /* 确保麻将牌不会阻止触摸事件 */
             pointer-events: auto;
+        }
+        
+        .tile img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+            padding: 2px;
+        }
+        
+        /* 统一所有麻将牌图片样式 */
+        .ai-tile img,
+        .discard-tile img,
+        .meld-tile img,
+        .tingpai-tile img,
+        .dev-tile img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+            padding: 1px;
         }
         
         .tile:hover {
             transform: translateY(-4px);
         }
         
-        .tile .num {
-            font-size: 18px;
-            color: #000;
-        }
-        
-        .tile .suit {
-            font-size: 11px;
-            color: #b00;
-        }
-        
-        .tile.honor {
-            font-size: 20px;
-            color: #000;
-        }
-        
         .tile.red-dragon {
-            color: #f00;
             background: #fff5f5;
         }
         
@@ -336,7 +340,7 @@
         }
         
         .tile.confirm-prompt::after {
-            content: "再次点击出牌";
+            content: "Click again to discard";
             position: absolute;
             top: -30px;
             left: 50%;
@@ -636,6 +640,17 @@
             top: 50%;
             transform: translateY(-50%);
             flex-direction: column;
+            align-items: center;
+        }
+        
+        .seat.left > div:first-child {
+            position: absolute;
+            left: -20px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 10;
+            font-weight: bold;
+            font-size: 16px;
         }
         
         .seat.right {
@@ -643,6 +658,17 @@
             top: 50%;
             transform: translateY(-50%);
             flex-direction: column;
+            align-items: center;
+        }
+        
+        .seat.right > div:first-child {
+            position: absolute;
+            right: -20px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 10;
+            font-weight: bold;
+            font-size: 16px;
         }
         
         .seat.left .hand,
@@ -1280,7 +1306,7 @@
             
             /* 手机端防误触确认提示 */
             .tile.confirm-prompt::after {
-                content: "再次点击出牌";
+                content: "Click again to discard";
                 position: absolute;
                 top: -25px;
                 left: 50%;
@@ -1522,11 +1548,11 @@
 </head>
 <body>
     <header>
-        <h1>广东麻将 - 红中变</h1>
-        <p>抵制不良游戏，拒绝盗版游戏。
-注意自我保护，谨防受骗上当。
-适度游戏益脑，沉迷游戏伤身。
-合理安排时间，享受健康生活。</p>
+        <h1>Guangdong Mahjong - Red Dragon Variant</h1>
+        <p>Resist bad games, reject pirated games.
+Pay attention to self-protection, beware of being deceived.
+Moderate gaming benefits the brain, addiction hurts the body.
+Arrange time reasonably, enjoy a healthy life.</p>
     </header>
     
     <div class="main-container">
@@ -1534,31 +1560,30 @@
             <div class="table-container">
                 <div class="table">
                     <div class="seat top">
-                        <div>北</div>
+                        <div>W</div>
                         <div id="hand-2" class="hand"></div>
                         <div id="melds-2" class="melds-container"></div>
                     </div>
                     
                     <div class="seat bottom">
-                        <div>南（你）</div>
+                        <div>E (You)</div>
                         <div id="hand-0" class="hand"></div>
                         <div id="melds-0" class="melds-container"></div>
                     </div>
                     
                     <div class="seat left">
-                        <div>西</div>
+                        <div>N</div>
                         <div id="hand-3" class="hand vertical"></div>
                         <div id="melds-3" class="melds-container"></div>
                     </div>
                     
                     <div class="seat right">
-                        <div>东</div>
+                        <div>S</div>
                         <div id="hand-1" class="hand vertical"></div>
                         <div id="melds-1" class="melds-container"></div>
                     </div>
                     
                     <div class="center">
-                        <h4>弃牌堆</h4>
                         <div id="discards" class="pile"></div>
                     </div>
                 </div>
@@ -1568,78 +1593,76 @@
         <div class="info-section">
             <!-- 听牌信息栏 -->
             <div id="tingpai-panel" class="tingpai-panel">
-                <div class="tingpai-title">听牌中 - 差以下牌可以胡牌：</div>
+                <div class="tingpai-title">Draw any one of the following tiles to win</div>
                 <div id="tingpai-tiles" class="tingpai-tiles"></div>
             </div>
             
             <!-- 规则按钮 -->
-            <button id="btn-rules" class="rules-btn">游戏规则</button>
+            <button id="btn-rules" class="rules-btn">Rules</button>
             
             <div class="scoreboard">
-                <div class="player-box" id="score-0">南（你）：0</div>
-                <div class="player-box" id="score-1">东：0</div>
-                <div class="player-box" id="score-2">北：0</div>
-                <div class="player-box" id="score-3">西：0</div>
+                <div class="player-box" id="score-0">E (You): 0</div>
+                <div class="player-box" id="score-1">S: 0</div>
+                <div class="player-box" id="score-2">W: 0</div>
+                <div class="player-box" id="score-3">N: 0</div>
             </div>
             
             <div class="info-panel">
                 <div class="controls">
-                    <button id="btn-start">开始新局</button>
-                    <button id="btn-win" class="win" disabled>胡牌</button>
-                    <button id="btn-peng" class="action" style="display: none;">碰</button>
-                    <button id="btn-gang" class="action" style="display: none;">杠</button>
-                    <button id="btn-skip" class="action" style="display: none;">跳过</button>
-                    <button id="btn-dev" class="dev-mode">开发者模式</button>
+                    <button id="btn-start">New Game</button>
+                    <button id="btn-win" class="win" disabled>Mahjong!</button>
+                    <button id="btn-peng" class="action" style="display: none;">Pung!</button>
+                    <button id="btn-gang" class="action" style="display: none;">Kong!</button>
+                    <button id="btn-skip" class="action" style="display: none;">Skip</button>
+                    <button id="btn-dev" class="dev-mode">Dev Mode</button>
                 </div>
                 <div class="log" id="log">
-                    <p>游戏已就绪，点击"开始新局"按钮开始游戏。</p>
-                    <p>红中变玩法：红中可以作为万能牌使用，但不能用于碰或杠。</p>
                 </div>
             </div>
         </div>
     </div>
 
     <div id="win-message" class="win-message">
-        <h2>玩家 胡牌了！</h2>
-        <p>玩家 获得 10 分</p>
-        <p>当前得分: 0 | 0 | 0 | 0</p>
-        <button id="btn-continue">继续游戏</button>
+        <h2>Player Win!</h2>
+        <p>Player Get 10 Points</p>
+        <p>Score: 0 | 0 | 0 | 0</p>
+        <button id="btn-continue">Continue</button>
     </div>
 
     <div id="countdown" class="countdown">10</div>
-    <div id="action-prompt" class="action-prompt">请选择动作（10秒后自动跳过）</div>
-    <div id="win-prompt" class="win-prompt">🎉 你可以胡牌了！点击"胡牌"按钮获胜 🎉</div>
+    <div id="action-prompt" class="action-prompt">Make your choice (Skip in 10s)</div>
+    <div id="win-prompt" class="win-prompt">🎉 You can call Mahjong! Click "Mahjong!" to win! 🎉</div>
 
     <!-- 规则模态框 -->
     <div id="rules-modal" class="rules-modal">
         <div class="rules-content">
             <span class="close-rules">&times;</span>
-            <img src="rules.png" alt="广东麻将游戏规则" onerror="this.style.display='none'; document.getElementById('rules-fallback').style.display='block';">
+            <img src="rules.png" alt="Guangdong Mahjong Rules" onerror="this.style.display='none'; document.getElementById('rules-fallback').style.display='block';">
             <div id="rules-fallback" style="display:none; padding: 20px; color: black; text-align: center;">
-                <h3>规则图片加载失败</h3>
-                <p>请确保rules.png图片文件位于正确的位置</p>
-                <h4>广东麻将（红中变）基本规则：</h4>
-                <p>1. 红中可以作为万能牌使用</p>
-                <p>2. 红中不能用于碰或杠</p>
-                <p>3. 游戏开始时庄家有14张牌，其他玩家13张</p>
-                <p>4. 玩家需组成4组顺子/刻子加一对将牌即可胡牌</p>
-                <p>5. 可以碰、杠其他玩家打出的牌</p>
-                <p>6. 胡牌后获得10分</p>
+                <h3>Rules image failed to load</h3>
+                <p>Please ensure rules.png is in the correct location</p>
+                <h4>Guangdong Mahjong (Red Dragon Variant) Basic Rules:</h4>
+                <p>1. Red Dragon can be used as a wild card</p>
+                <p>2. Red Dragon cannot be used for Pung or Kong</p>
+                <p>3. Dealer starts with 14 tiles, other players with 13</p>
+                <p>4. Players need to form 4 sets of sequences/triplets plus a pair to win</p>
+                <p>5. Can Pung or Kong tiles discarded by other players</p>
+                <p>6. Win to get 10 points</p>
             </div>
         </div>
     </div>
 
     <div id="dev-panel" class="dev-panel">
-        <h3>开发者模式</h3>
+        <h3>Dev Mode</h3>
         <div class="tile-palette" id="tile-palette"></div>
         <div class="dev-controls">
-            <button id="btn-clear-hand">清空手牌</button>
-            <button id="btn-test-win">测试胡牌</button>
-            <button id="btn-add-random">随机添加5张牌</button>
-            <button id="btn-add-red-dragon">添加红中</button>
+            <button id="btn-clear-hand">Clear Hand</button>
+            <button id="btn-test-win">Test Win</button>
+            <button id="btn-add-random">Add 5 Random Tiles</button>
+            <button id="btn-add-red-dragon">Add Red Dragon</button>
         </div>
         <div class="dev-info">
-            <p>点击牌库中的牌添加到手牌</p>
+            <p>Click tiles in the palette to add them to your hand</p>
             <p>点击手牌可从手牌中移除</p>
         </div>
     </div>
@@ -1648,7 +1671,7 @@
         // 检测是否为移动设备
         const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
         
-        const PLAYER_NAMES = ['南（你）', '东', '北', '西'];
+        const PLAYER_NAMES = ['E (You)', 'S', 'W', 'N'];
         const WIN_SCORE = 10;
         const REACTION_TIME = 10000;
         const WIN_PROMPT_TIME = 5000;
@@ -1684,6 +1707,7 @@
             devMode: false,
             redDragonWildcard: true,
             tingPaiTiles: [], // 新增：听牌列表
+            gameReadyShown: false, // 标志：Game ready信息是否已显示
             // 手机端防误触状态
             mobileSelectedTileIndex: -1, // 选中的麻将牌索引
             isConfirmingDiscard: false   // 是否处于确认出牌状态
@@ -1720,12 +1744,12 @@
         let isDragging = false;
         let dragOffsetX, dragOffsetY;
         
-        // 显示规则模态框
+        // 跳转到规则网页
         function showRules() {
-            rulesModal.style.display = 'flex';
+            window.open('https://ruckers2333.github.io/mahjong-rule', '_blank');
         }
         
-        // 隐藏规则模态框
+        // 隐藏规则模态框（保留以防其他地方使用）
         function hideRules() {
             rulesModal.style.display = 'none';
         }
@@ -1745,21 +1769,13 @@
                         tileEl.classList.add('red-dragon');
                     }
                     
-                    if (tile.type === 'honor') {
-                        tileEl.classList.add('honor');
-                        tileEl.textContent = tileToChinese(tile);
-                    } else {
-                        const num = document.createElement('div');
-                        num.className = 'num';
-                        num.textContent = tile.rank;
-                        
-                        const suit = document.createElement('div');
-                        suit.className = 'suit';
-                        suit.innerHTML = (tile.suit === 'm' ? '万' : tile.suit === 'p' ? '筒' : '条');
-                        
-                        tileEl.appendChild(num);
-                        tileEl.appendChild(suit);
-                    }
+                    const img = document.createElement('img');
+                    img.src = getTileImagePath(tile);
+                    img.alt = tileToChinese(tile);
+                    img.style.width = '100%';
+                    img.style.height = '100%';
+                    img.style.objectFit = 'contain';
+                    tileEl.appendChild(img);
                     
                     tingPaiTilesEl.appendChild(tileEl);
                 }
@@ -1803,7 +1819,7 @@
             renderTingPai();
             
             if (state.tingPaiTiles.length > 0) {
-                log(`听牌状态：差 ${state.tingPaiTiles.map(t => tileToChinese(t)).join('、')} 可以胡牌`);
+                log(`Waiting for tiles: Need ${state.tingPaiTiles.map(t => tileToEnglish(t)).join(', ')} to win`);
             }
         }
         
@@ -1893,51 +1909,75 @@
                 }
             }
             
-            if (suit !== 'z' && rank <= 7) {
-                const next1 = `${suit}${rank + 1}`;
-                const next2 = `${suit}${rank + 2}`;
+            if (suit !== 'z') {
+                // 尝试所有可能的顺子组合
+                const possibleSequences = [];
                 
-                const count1 = counts[next1] || 0;
-                const count2 = counts[next2] || 0;
-                
-                if (counts[firstKey] > 0 && count1 > 0 && count2 > 0) {
-                    const newCounts = {...counts};
-                    newCounts[firstKey] -= 1;
-                    newCounts[next1] -= 1;
-                    newCounts[next2] -= 1;
-                    
-                    for (const key of [firstKey, next1, next2]) {
-                        if (newCounts[key] === 0) delete newCounts[key];
-                    }
-                    
-                    if (canFormMeldGroupsWithRedDragon(newCounts, redDragons, n - 1)) {
-                        return true;
-                    }
+                // rank, rank+1, rank+2 (如果rank <= 7)
+                if (rank <= 7) {
+                    possibleSequences.push([rank, rank + 1, rank + 2]);
+                }
+                // rank-1, rank, rank+1 (如果rank >= 2 && rank <= 8)
+                if (rank >= 2 && rank <= 8) {
+                    possibleSequences.push([rank - 1, rank, rank + 1]);
+                }
+                // rank-2, rank-1, rank (如果rank >= 3)
+                if (rank >= 3) {
+                    possibleSequences.push([rank - 2, rank - 1, rank]);
                 }
                 
-                let missing = 0;
-                if (counts[firstKey] === 0) missing++;
-                if (count1 === 0) missing++;
-                if (count2 === 0) missing++;
-                
-                if (redDragons >= missing) {
-                    const newCounts = {...counts};
+                for (const seq of possibleSequences) {
+                    const [r1, r2, r3] = seq;
+                    const key1 = `${suit}${r1}`;
+                    const key2 = `${suit}${r2}`;
+                    const key3 = `${suit}${r3}`;
                     
-                    if (counts[firstKey] > 0) {
-                        newCounts[firstKey] -= 1;
-                        if (newCounts[firstKey] === 0) delete newCounts[firstKey];
-                    }
-                    if (count1 > 0) {
-                        newCounts[next1] -= 1;
-                        if (newCounts[next1] === 0) delete newCounts[next1];
-                    }
-                    if (count2 > 0) {
-                        newCounts[next2] -= 1;
-                        if (newCounts[next2] === 0) delete newCounts[next2];
+                    const count1 = counts[key1] || 0;
+                    const count2 = counts[key2] || 0;
+                    const count3 = counts[key3] || 0;
+                    
+                    // 检查是否可以用实际牌组成顺子
+                    if (count1 > 0 && count2 > 0 && count3 > 0) {
+                        const newCounts = {...counts};
+                        newCounts[key1] -= 1;
+                        newCounts[key2] -= 1;
+                        newCounts[key3] -= 1;
+                        
+                        for (const key of [key1, key2, key3]) {
+                            if (newCounts[key] === 0) delete newCounts[key];
+                        }
+                        
+                        if (canFormMeldGroupsWithRedDragon(newCounts, redDragons, n - 1)) {
+                            return true;
+                        }
                     }
                     
-                    if (canFormMeldGroupsWithRedDragon(newCounts, redDragons - missing, n - 1)) {
-                        return true;
+                    // 检查是否可以用红中补全顺子
+                    let missing = 0;
+                    if (count1 === 0) missing++;
+                    if (count2 === 0) missing++;
+                    if (count3 === 0) missing++;
+                    
+                    // 至少需要有一张牌存在，且红中数量足够补全缺失的牌
+                    if (redDragons >= missing && missing > 0 && missing < 3 && (count1 > 0 || count2 > 0 || count3 > 0)) {
+                        const newCounts = {...counts};
+                        
+                        if (count1 > 0) {
+                            newCounts[key1] -= 1;
+                            if (newCounts[key1] === 0) delete newCounts[key1];
+                        }
+                        if (count2 > 0) {
+                            newCounts[key2] -= 1;
+                            if (newCounts[key2] === 0) delete newCounts[key2];
+                        }
+                        if (count3 > 0) {
+                            newCounts[key3] -= 1;
+                            if (newCounts[key3] === 0) delete newCounts[key3];
+                        }
+                        
+                        if (canFormMeldGroupsWithRedDragon(newCounts, redDragons - missing, n - 1)) {
+                            return true;
+                        }
                     }
                 }
             }
@@ -2117,6 +2157,30 @@
             return t.suit + (t.type === 'number' ? t.rank : t.rank);
         }
         
+        // 获取麻将牌图片路径
+        function getTileImagePath(t) {
+            if (t.type === 'honor') {
+                const honorMap = {
+                    'east': 'E.png',
+                    'south': 'S.png',
+                    'west': 'W.png',
+                    'north': 'N.png',
+                    'red': 'R.png',
+                    'green': 'F.png',
+                    'white': 'WH.png'
+                };
+                return `tiles/${honorMap[t.rank]}`;
+            } else {
+                // 数字牌
+                const suitMap = {
+                    'm': 'C',  // 万 -> C
+                    'p': 'D',  // 筒 -> D
+                    's': 'B'   // 条 -> B
+                };
+                return `tiles/${suitMap[t.suit]}${t.rank}.png`;
+            }
+        }
+        
         function tileToChinese(t) {
             if (t.type === 'honor') {
                 const honorMap = {
@@ -2150,6 +2214,41 @@
             };
             
             return numMap[t.rank] + suitMap[t.suit];
+        }
+        
+        function tileToEnglish(t) {
+            if (t.type === 'honor') {
+                const honorMap = {
+                    'east': 'East',
+                    'south': 'South',
+                    'west': 'West',
+                    'north': 'North',
+                    'red': 'Red Dragon',
+                    'green': 'Green Dragon',
+                    'white': 'White Dragon'
+                };
+                return honorMap[t.rank];
+            }
+            
+            const suitMap = {
+                'm': 'Character',
+                'p': 'Dot',
+                's': 'Bamboo'
+            };
+            
+            const numMap = {
+                1: 'One',
+                2: 'Two',
+                3: 'Three',
+                4: 'Four',
+                5: 'Five',
+                6: 'Six',
+                7: 'Seven',
+                8: 'Eight',
+                9: 'Nine'
+            };
+            
+            return numMap[t.rank] + ' ' + suitMap[t.suit];
         }
         
         function shuffle(a) {
@@ -2189,21 +2288,13 @@
             }
             
             if (!opts.back) {
-                if (t.type === 'honor') {
-                    el.classList.add('honor');
-                    el.textContent = tileToChinese(t);
-                } else {
-                    const num = document.createElement('div');
-                    num.className = 'num';
-                    num.textContent = t.rank;
-                    
-                    const suit = document.createElement('div');
-                    suit.className = 'suit';
-                    suit.innerHTML = (t.suit === 'm' ? '万' : t.suit === 'p' ? '筒' : '条');
-                    
-                    el.appendChild(num);
-                    el.appendChild(suit);
-                }
+                const img = document.createElement('img');
+                img.src = getTileImagePath(t);
+                img.alt = tileToChinese(t);
+                img.style.width = '100%';
+                img.style.height = '100%';
+                img.style.objectFit = 'contain';
+                el.appendChild(img);
             }
             
             // 优化触摸事件处理
@@ -2227,21 +2318,13 @@
                 el.classList.add('red-dragon');
             }
             
-            if (t.type === 'honor') {
-                el.classList.add('honor');
-                el.textContent = tileToChinese(t);
-            } else {
-                const num = document.createElement('div');
-                num.className = 'num';
-                num.textContent = t.rank;
-                
-                const suit = document.createElement('div');
-                suit.className = 'suit';
-                suit.innerHTML = (t.suit === 'm' ? '万' : t.suit === 'p' ? '筒' : '条');
-                
-                el.appendChild(num);
-                el.appendChild(suit);
-            }
+            const img = document.createElement('img');
+            img.src = getTileImagePath(t);
+            img.alt = tileToChinese(t);
+            img.style.width = '100%';
+            img.style.height = '100%';
+            img.style.objectFit = 'contain';
+            el.appendChild(img);
             
             el.addEventListener('click', () => {
                 if (state.devMode) {
@@ -2255,9 +2338,9 @@
                         renderAll();
                         checkWinCondition(0);
                         checkTingPai(); // 检查听牌状态
-                        log(`开发者模式：添加 ${tileToChinese(t)} 到手牌`);
+                        log(`Dev Mode: Added ${tileToChinese(t)} to hand`);
                     } else {
-                        log(`开发者模式：牌库中没有 ${tileToChinese(t)} 了`);
+                        log(`Dev Mode: No more ${tileToChinese(t)} in wall`);
                     }
                 }
             });
@@ -2273,21 +2356,13 @@
                 el.classList.add('red-dragon');
             }
             
-            if (t.type === 'honor') {
-                el.classList.add('honor');
-                el.textContent = tileToChinese(t);
-            } else {
-                const num = document.createElement('div');
-                num.className = 'num';
-                num.textContent = t.rank;
-                
-                const suit = document.createElement('div');
-                suit.className = 'suit';
-                suit.innerHTML = (t.suit === 'm' ? '万' : t.suit === 'p' ? '筒' : '条');
-                
-                el.appendChild(num);
-                el.appendChild(suit);
-            }
+            const img = document.createElement('img');
+            img.src = getTileImagePath(t);
+            img.alt = tileToChinese(t);
+            img.style.width = '100%';
+            img.style.height = '100%';
+            img.style.objectFit = 'contain';
+            el.appendChild(img);
             
             return el;
         }
@@ -2300,21 +2375,13 @@
                 el.classList.add('red-dragon');
             }
             
-            if (t.type === 'honor') {
-                el.classList.add('honor');
-                el.textContent = tileToChinese(t);
-            } else {
-                const num = document.createElement('div');
-                num.className = 'num';
-                num.textContent = t.rank;
-                
-                const suit = document.createElement('div');
-                suit.className = 'suit';
-                suit.innerHTML = (t.suit === 'm' ? '万' : t.suit === 'p' ? '筒' : '条');
-                
-                el.appendChild(num);
-                el.appendChild(suit);
-            }
+            const img = document.createElement('img');
+            img.src = getTileImagePath(t);
+            img.alt = tileToChinese(t);
+            img.style.width = '100%';
+            img.style.height = '100%';
+            img.style.objectFit = 'contain';
+            el.appendChild(img);
             
             return el;
         }
@@ -2351,7 +2418,7 @@
         }
         
         function showActionPrompt() {
-            promptEl.textContent = '请选择动作（10秒后自动跳过）';
+            promptEl.textContent = 'Make your choice (Skip in 10s)';
             promptEl.style.display = 'block';
         }
         
@@ -2385,12 +2452,12 @@
             if (state.devMode) {
                 devBtn.classList.add('active');
                 devPanel.classList.add('active');
-                log('开发者模式已开启');
+                log('Dev Mode enabled');
                 renderTilePalette();
             } else {
                 devBtn.classList.remove('active');
                 devPanel.classList.remove('active');
-                log('开发者模式已关闭');
+                log('Dev Mode disabled');
             }
             
             renderAll();
@@ -2442,7 +2509,7 @@
                 renderAll();
                 checkWinCondition(0);
                 checkTingPai(); // 检查听牌状态
-                log('开发者模式：清空手牌，已放回牌库');
+                log('Dev Mode: Cleared hand, tiles returned to wall');
             }
         }
         
@@ -2470,7 +2537,7 @@
                 renderAll();
                 checkWinCondition(0);
                 checkTingPai(); // 检查听牌状态
-                log('开发者模式：设置测试胡牌手牌（包含红中）');
+                log('Dev Mode: Set test winning hand (includes Red Dragon)');
             }
         }
         
@@ -2485,7 +2552,7 @@
                 renderAll();
                 checkWinCondition(0);
                 checkTingPai(); // 检查听牌状态
-                log('开发者模式：随机添加5张牌到手牌（从牌库抽取）');
+                log('Dev Mode: Added 5 random tiles to hand (drawn from wall)');
             }
         }
         
@@ -2501,9 +2568,9 @@
                     renderAll();
                     checkWinCondition(0);
                     checkTingPai(); // 检查听牌状态
-                    log('开发者模式：添加红中到手牌（从牌库抽取）');
+                    log('Dev Mode: Added Red Dragon to hand (drawn from wall)');
                 } else {
-                    log('开发者模式：牌库中没有红中了');
+                    log('Dev Mode: No more Red Dragons in wall');
                 }
             }
         }
@@ -2572,9 +2639,8 @@
             checkWinCondition(0);
             checkTingPai(); // 检查听牌状态
             hideActionButtons();
-            log('新局开始。庄家（你，南家）14 张牌，请先出牌。');
-            log(`剩余牌数: ${state.wall.length}`);
-            log('红中变玩法：红中可以作为万能牌使用，但不能用于碰或杠。');
+            log('New game started. Dealer (You, East) has 14 tiles, please discard first.');
+            log(`Remaining tiles: ${state.wall.length}`);
         }
         
         function sortHand(hand) {
@@ -2661,7 +2727,7 @@
                                     renderAll();
                                     checkWinCondition(0);
                                     checkTingPai();
-                                    log(`开发者模式：移除 ${tileToChinese(tile)} 并放回牌库`);
+                                    log(`Dev Mode: Removed ${tileToChinese(tile)} and returned to wall`);
                                 } else {
                                     onPlayerTileClick(j);
                                 }
@@ -2699,7 +2765,7 @@
                                         renderAll();
                                         checkWinCondition(0);
                                         checkTingPai();
-                                        log(`开发者模式：移除 ${tileToChinese(tile)} 并放回牌库`);
+                                        log(`Dev Mode: Removed ${tileToChinese(tile)} and returned to wall`);
                                     } else {
                                         onPlayerTileClick(j);
                                     }
@@ -2747,12 +2813,12 @@
         
         function onPlayerTileClick(index) {
             if (state.currentPlayer !== 0) {
-                log('不是你的回合');
+                log('Not your turn');
                 return;
             }
             
             if (!state.waitingForDiscard) {
-                log('你不能再出牌');
+                log('You cannot discard now');
                 return;
             }
             
@@ -2774,7 +2840,7 @@
                         state.firstTurn = false;
                     }
                     
-                    log('你打出：' + tileToChinese(t));
+                    log('You discard: ' + tileToEnglish(t));
                     renderAll();
                     checkTingPai(); // 检查听牌状态
                     
@@ -2785,20 +2851,20 @@
                     state.mobileSelectedTileIndex = index;
                     state.isConfirmingDiscard = false;
                     renderAll();
-                    log(`选中 ${tileToChinese(state.hands[0][index])}，请再次点击确认出牌`);
+                    log(`Selected ${tileToEnglish(state.hands[0][index])}, please click again to confirm discard`);
                 }
                 // 如果还没有选中牌，则选中这张牌
                 else if (state.mobileSelectedTileIndex === -1) {
                     state.mobileSelectedTileIndex = index;
                     state.isConfirmingDiscard = false;
                     renderAll();
-                    log(`选中 ${tileToChinese(state.hands[0][index])}，请再次点击确认出牌`);
+                    log(`Selected ${tileToEnglish(state.hands[0][index])}, please click again to confirm discard`);
                 }
                 // 如果已经选中了同一张牌但还没确认，则进入确认状态
                 else if (state.mobileSelectedTileIndex === index && !state.isConfirmingDiscard) {
                     state.isConfirmingDiscard = true;
                     renderAll();
-                    log(`确认出牌 ${tileToChinese(state.hands[0][index])}，请再次点击出牌`);
+                    log(`Confirm discard ${tileToEnglish(state.hands[0][index])}, please click again to discard`);
                 }
             } else {
                 // 非手机端，直接出牌
@@ -2814,7 +2880,7 @@
                     state.firstTurn = false;
                 }
                 
-                log('你打出：' + tileToChinese(t));
+                log('You discard: ' + tileToEnglish(t));
                 renderAll();
                 checkTingPai(); // 检查听牌状态
                 
@@ -2940,12 +3006,12 @@
             state.currentPlayer = playerIndex;
             state.waitingForDiscard = true;
             
-            log(`${PLAYER_NAMES[playerIndex]} 碰了 ${tileToChinese(tile)}`);
+            log(`${PLAYER_NAMES[playerIndex]} Pung ${tileToEnglish(tile)}`);
             renderAll();
             checkTingPai(); // 检查听牌状态
             
             if (playerIndex === 0) {
-                log('请打出一张牌');
+                log('Please discard a tile');
             } else {
                 setTimeout(() => {
                     const idx = Math.floor(Math.random() * state.hands[playerIndex].length);
@@ -2955,7 +3021,7 @@
                     state.lastDiscardPlayer = playerIndex;
                     state.waitingForDiscard = false;
                     
-                    log(`${PLAYER_NAMES[playerIndex]} 打出：${tileToChinese(dt)}`);
+                    log(`${PLAYER_NAMES[playerIndex]} discards: ${tileToEnglish(dt)}`);
                     renderAll();
                     checkTingPai(); // 检查听牌状态
                     processPendingActions();
@@ -2991,7 +3057,7 @@
             
             state.discards.pop();
             
-            log(`${PLAYER_NAMES[playerIndex]} 杠了 ${tileToChinese(tile)}`);
+            log(`${PLAYER_NAMES[playerIndex]} Kong ${tileToEnglish(tile)}`);
             
             if (state.wall.length > 0) {
                 const newTile = state.wall.pop();
@@ -3002,8 +3068,8 @@
                     state.newDrawTileId = newTile.id;
                 }
                 
-                log(`${PLAYER_NAMES[playerIndex]} 杠后摸牌: ${tileToChinese(newTile)}`);
-                log(`剩余牌数: ${state.wall.length}`);
+                log(`${PLAYER_NAMES[playerIndex]} draws after Kong: ${tileToEnglish(newTile)}`);
+                log(`Remaining tiles: ${state.wall.length}`);
             }
             
             state.currentPlayer = playerIndex;
@@ -3012,7 +3078,7 @@
             checkTingPai(); // 检查听牌状态
             
             if (playerIndex === 0) {
-                log('请打出一张牌');
+                log('Please discard a tile');
             } else {
                 setTimeout(() => {
                     const idx = Math.floor(Math.random() * state.hands[playerIndex].length);
@@ -3022,7 +3088,7 @@
                     state.lastDiscardPlayer = playerIndex;
                     state.waitingForDiscard = false;
                     
-                    log(`${PLAYER_NAMES[playerIndex]} 打出：${tileToChinese(dt)}`);
+                    log(`${PLAYER_NAMES[playerIndex]} discards: ${tileToEnglish(dt)}`);
                     renderAll();
                     checkTingPai(); // 检查听牌状态
                     processPendingActions();
@@ -3056,7 +3122,7 @@
                     gangType: 'angang'
                 });
                 
-                log(`${PLAYER_NAMES[playerIndex]} 暗杠 ${tileToChinese(tile)}`);
+                log(`${PLAYER_NAMES[playerIndex]} Concealed Kong ${tileToEnglish(tile)}`);
             } else if (gangType === 'jiagang') {
                 let removed = 0;
                 for (let i = hand.length - 1; i >= 0; i--) {
@@ -3071,7 +3137,7 @@
                 meld.gangType = 'jiagang';
                 meld.tiles.push({...tile});
                 
-                log(`${PLAYER_NAMES[playerIndex]} 加杠 ${tileToChinese(tile)}`);
+                log(`${PLAYER_NAMES[playerIndex]} Added Kong ${tileToEnglish(tile)}`);
             }
             
             if (state.wall.length > 0) {
@@ -3083,8 +3149,8 @@
                     state.newDrawTileId = newTile.id;
                 }
                 
-                log(`${PLAYER_NAMES[playerIndex]} 杠后摸牌: ${tileToChinese(newTile)}`);
-                log(`剩余牌数: ${state.wall.length}`);
+                log(`${PLAYER_NAMES[playerIndex]} draws after Kong: ${tileToEnglish(newTile)}`);
+                log(`Remaining tiles: ${state.wall.length}`);
             }
             
             state.currentPlayer = playerIndex;
@@ -3093,7 +3159,7 @@
             checkTingPai(); // 检查听牌状态
             
             if (playerIndex === 0) {
-                log('请打出一张牌');
+                log('Please discard a tile');
             } else {
                 setTimeout(() => {
                     const idx = Math.floor(Math.random() * state.hands[playerIndex].length);
@@ -3103,7 +3169,7 @@
                     state.lastDiscardPlayer = playerIndex;
                     state.waitingForDiscard = false;
                     
-                    log(`${PLAYER_NAMES[playerIndex]} 打出：${tileToChinese(dt)}`);
+                    log(`${PLAYER_NAMES[playerIndex]} discards: ${tileToEnglish(dt)}`);
                     renderAll();
                     checkTingPai(); // 检查听牌状态
                     processPendingActions();
@@ -3117,7 +3183,7 @@
             
             hideActionPrompt();
             countdownEl.style.display = 'none';
-            log('你选择跳过动作');
+            log('You chose to skip');
             
             if (state.countdownInterval) {
                 clearInterval(state.countdownInterval);
@@ -3186,12 +3252,12 @@
             
             hideWinPrompt();
             
-            winMessageEl.querySelector('h2').textContent = `${playerName} 胡牌了！`;
-            winMessageEl.querySelector('p:nth-child(2)').textContent = `${playerName} 获得 ${WIN_SCORE} 分`;
-            winMessageEl.querySelector('p:nth-child(3)').textContent = `当前得分: ${state.scores.join(' | ')}`;
+            winMessageEl.querySelector('h2').textContent = `${playerName} Win!`;
+            winMessageEl.querySelector('p:nth-child(2)').textContent = `${playerName} Get ${WIN_SCORE} Points`;
+            winMessageEl.querySelector('p:nth-child(3)').textContent = `Score: ${state.scores.join(' | ')}`;
             winMessageEl.style.display = 'block';
             
-            log(`🎉 ${playerName} 胡牌了！获得 ${WIN_SCORE} 分`);
+            log(`🎉 ${playerName} wins! Gets ${WIN_SCORE} points`);
             state.gameOver = true;
             
             // 隐藏听牌信息栏
@@ -3224,7 +3290,7 @@
                     
                     showActionButtons();
                     showActionPrompt();
-                    log('你可以选择碰或杠，请在10秒内决定');
+                    log('You can Pung or Kong, decide within 10 seconds');
                     
                     showCountdown();
                     
@@ -3280,14 +3346,14 @@
                         
                         state.newDrawTileId = t.id;
                         
-                        log('你摸到一张牌，请出牌。');
-                        log(`剩余牌数: ${state.wall.length}`);
+                        log('You drew a tile, please discard.');
+                        log(`Remaining tiles: ${state.wall.length}`);
                         renderAll();
                         
                         if (checkWinCondition(0)) {
                             winBtn.disabled = false;
                             showWinPrompt();
-                            log('🎯 你可以胡牌了！点击"胡牌"按钮获胜。');
+                            log('🎯 You can win! Click "Mahjong!" button to win.');
                         }
                         
                         checkTingPai(); // 检查听牌状态
@@ -3301,7 +3367,7 @@
                             
                             showActionButtons();
                             showActionPrompt();
-                            log(`你可以${gangCheck.gangType === 'angang' ? '暗杠' : '加杠'} ${tileToChinese(gangCheck.tile)}，请在10秒内决定`);
+                            log(`You can ${gangCheck.gangType === 'angang' ? 'Concealed Kong' : 'Added Kong'} ${tileToEnglish(gangCheck.tile)}, decide within 10 seconds`);
                             
                             showCountdown();
                             
@@ -3317,9 +3383,9 @@
                             return;
                         }
                     } else {
-                        log('牌墙没了，流局。');
+                        log('Wall is empty, draw game.');
                         setTimeout(() => {
-                            alert('牌墙已空，流局！');
+                            alert('Wall is empty, draw game!');
                             reset();
                         }, 1000);
                     }
@@ -3329,8 +3395,8 @@
                         const t = state.wall.pop();
                         state.hands[state.currentPlayer].push(t);
                         sortHand(state.hands[state.currentPlayer]);
-                        log(`${PLAYER_NAMES[state.currentPlayer]} 摸牌`);
-                        log(`剩余牌数: ${state.wall.length}`);
+                        log(`${PLAYER_NAMES[state.currentPlayer]} draws a tile`);
+                        log(`Remaining tiles: ${state.wall.length}`);
                         
                         if (checkWinCondition(state.currentPlayer)) {
                             processWin(state.currentPlayer);
@@ -3350,7 +3416,7 @@
                         state.lastDiscardPlayer = state.currentPlayer;
                         state.waitingForDiscard = false;
                         
-                        log(`${PLAYER_NAMES[state.currentPlayer]} 打出：${tileToChinese(dt)}`);
+                        log(`${PLAYER_NAMES[state.currentPlayer]} discards: ${tileToEnglish(dt)}`);
                         renderAll();
                         checkTingPai(); // 检查听牌状态
                         
@@ -3381,14 +3447,14 @@
                 
                 state.newDrawTileId = t.id;
                 
-                log('你摸到一张牌，请出牌。');
-                log(`剩余牌数: ${state.wall.length}`);
+                log('You drew a tile, please discard.');
+                log(`Remaining tiles: ${state.wall.length}`);
                 renderAll();
                 
                 if (checkWinCondition(0)) {
                     winBtn.disabled = false;
                     showWinPrompt();
-                    log('🎯 你可以胡牌了！点击"胡牌"按钮获胜。');
+                    log('🎯 You can win! Click "Mahjong!" button to win.');
                 }
                 
                 checkTingPai(); // 检查听牌状态
@@ -3402,7 +3468,7 @@
                     
                     showActionButtons();
                     showActionPrompt();
-                    log(`你可以${gangCheck.gangType === 'angang' ? '暗杠' : '加杠'} ${tileToChinese(gangCheck.tile)}，请在10秒内决定`);
+                    log(`You can ${gangCheck.gangType === 'angang' ? 'Concealed Kong' : 'Added Kong'} ${tileToEnglish(gangCheck.tile)}, decide within 10 seconds`);
                     
                     showCountdown();
                     
@@ -3425,8 +3491,8 @@
                 const t = state.wall.pop();
                 state.hands[state.currentPlayer].push(t);
                 sortHand(state.hands[state.currentPlayer]);
-                log(`${PLAYER_NAMES[state.currentPlayer]} 摸牌`);
-                log(`剩余牌数: ${state.wall.length}`);
+                log(`${PLAYER_NAMES[state.currentPlayer]} draws a tile`);
+                log(`Remaining tiles: ${state.wall.length}`);
                 
                 if (checkWinCondition(state.currentPlayer)) {
                     processWin(state.currentPlayer);
@@ -3446,7 +3512,7 @@
                 state.lastDiscardPlayer = state.currentPlayer;
                 state.waitingForDiscard = false;
                 
-                log(`${PLAYER_NAMES[state.currentPlayer]} 打出：${tileToChinese(dt)}`);
+                log(`${PLAYER_NAMES[state.currentPlayer]} discards: ${tileToEnglish(dt)}`);
                 renderAll();
                 checkTingPai(); // 检查听牌状态
                 
@@ -3487,7 +3553,7 @@
                     processWin(0);
                     winBtn.disabled = true;
                 } else {
-                    log('你还没有胡牌！');
+                    log('You have not won yet!');
                 }
             });
             
@@ -3588,9 +3654,10 @@
                 addRedDragon();
             });
             
-            log('游戏已就绪，点击"开始新局"按钮开始游戏。');
-            log('点击"游戏规则"按钮查看详细玩法说明。');
-            log('红中变玩法：红中可以作为万能牌使用，但不能用于碰或杠。');
+            if (!state.gameReadyShown) {
+                log('Game ready. Click "New Game" button to start.');
+                state.gameReadyShown = true;
+            }
         }
         
         initGame();
