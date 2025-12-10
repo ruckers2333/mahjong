@@ -1528,18 +1528,54 @@
             :root {
                 --player-tile-w: 44px;
                 --player-tile-h: 64px;
-                --ai-tile-w: 32px;
-                --ai-tile-h: 46px;
+                /* 进一步缩小N、S、W玩家的手牌尺寸 */
+                --ai-tile-w: 28px;
+                --ai-tile-h: 40px;
                 /* 缩小桌面中央的麻将牌（N、S、W玩家打出的牌），避免挡住E玩家的手牌 */
                 --discard-tile-w: 26px;
                 --discard-tile-h: 38px;
-                --meld-tile-w: 24px;
-                --meld-tile-h: 34px;
+                --meld-tile-w: 22px;
+                --meld-tile-h: 31px;
+                /* 减小N、S、W玩家手牌之间的间距，使牌墙更紧凑 */
+                --gap: 4px;
             }
             
             /* 缩小桌面中央区域的显示，进一步避免遮挡 */
             .center {
                 transform: translate(-50%, -50%) scale(0.85);
+            }
+            
+            /* 减小N、S、W玩家手牌的间距，使牌墙更紧凑 */
+            .seat.top .hand,
+            .seat.left .hand,
+            .seat.right .hand {
+                gap: 3px;
+            }
+            
+            /* 减小N、S、W玩家碰/杠区域的间距 */
+            .seat.top .melds-container,
+            .seat.left .melds-container,
+            .seat.right .melds-container {
+                gap: 4px;
+            }
+            
+            /* 调整N、S、W玩家手牌的字体大小，适配缩小后的尺寸 */
+            .seat.top .ai-tile .num,
+            .seat.left .ai-tile .num,
+            .seat.right .ai-tile .num {
+                font-size: 12px;
+            }
+            
+            .seat.top .ai-tile .suit,
+            .seat.left .ai-tile .suit,
+            .seat.right .ai-tile .suit {
+                font-size: 8px;
+            }
+            
+            .seat.top .ai-tile.honor,
+            .seat.left .ai-tile.honor,
+            .seat.right .ai-tile.honor {
+                font-size: 14px;
             }
             
             .rules-btn {
