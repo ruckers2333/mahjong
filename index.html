@@ -1530,6 +1530,16 @@
                 --player-tile-h: 64px;
                 --ai-tile-w: 32px;
                 --ai-tile-h: 46px;
+                /* 缩小桌面中央的麻将牌（N、S、W玩家打出的牌），避免挡住E玩家的手牌 */
+                --discard-tile-w: 26px;
+                --discard-tile-h: 38px;
+                --meld-tile-w: 24px;
+                --meld-tile-h: 34px;
+            }
+            
+            /* 缩小桌面中央区域的显示，进一步避免遮挡 */
+            .center {
+                transform: translate(-50%, -50%) scale(0.85);
             }
             
             .rules-btn {
