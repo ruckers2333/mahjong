@@ -1739,7 +1739,8 @@ Arrange time reasonably, enjoy a healthy life.</p>
                 gang: false,
                 gangAfterDraw: false,
                 gangType: null,
-                gangTile: null
+                gangTile: null,
+                meldIndex: null
             },
             reactionTimer: null,
             countdown: 10,
@@ -1871,6 +1872,18 @@ Arrange time reasonably, enjoy a healthy life.</p>
         
         // 使用指定手牌检查胡牌条件
         function checkWinConditionWithHand(hand) {
+            // 检查特殊胡牌：七小对和十三幺
+            if (hand.length === 14) {
+                // 检查七小对
+                if (checkSevenPairs(hand)) {
+                    return true;
+                }
+                // 检查十三幺
+                if (checkThirteenOrphans(hand)) {
+                    return true;
+                }
+            }
+            
             const n = (hand.length - 2) / 3;
             
             const counts = {};
@@ -2630,7 +2643,7 @@ Arrange time reasonably, enjoy a healthy life.</p>
             state.waitingForDiscard = true;
             state.firstTurn = true;
             state.gameOver = false;
-            state.availableActions = { peng: false, gang: false, gangAfterDraw: false, gangType: null, gangTile: null };
+            state.availableActions = { peng: false, gang: false, gangAfterDraw: false, gangType: null, gangTile: null, meldIndex: null };
             state.isReacting = false;
             state.pendingAction = null;
             state.countdown = 10;
@@ -2844,7 +2857,7 @@ Arrange time reasonably, enjoy a healthy life.</p>
             pengBtn.style.display = 'none';
             gangBtn.style.display = 'none';
             skipBtn.style.display = 'none';
-            state.availableActions = { peng: false, gang: false, gangAfterDraw: false, gangType: null, gangTile: null };
+            state.availableActions = { peng: false, gang: false, gangAfterDraw: false, gangType: null, gangTile: null, meldIndex: null };
         }
         
         function showActionButtons() {
@@ -2954,11 +2967,18 @@ Arrange time reasonably, enjoy a healthy life.</p>
         }
         
         function checkGang(playerIndex, tile) {
+            // 不能杠自己打出的牌
             if (playerIndex === state.lastDiscardPlayer) return false;
+            
+            // 红中不能用于杠
+            if (state.redDragonWildcard && tile.type === 'honor' && tile.rank === 'red') {
+                return false;
+            }
             
             const hand = state.hands[playerIndex];
             let count = 0;
             
+            // 统计手牌中与打出的牌相同的牌的数量（排除红中）
             for (const t of hand) {
                 if (state.redDragonWildcard && t.type === 'honor' && t.rank === 'red') {
                     continue;
@@ -2969,6 +2989,7 @@ Arrange time reasonably, enjoy a healthy life.</p>
                 }
             }
             
+            // 明杠：手牌中需要有3张相同的牌
             return count >= 3;
         }
         
@@ -2986,6 +3007,7 @@ Arrange time reasonably, enjoy a healthy life.</p>
                 tileCounts[id] = (tileCounts[id] || 0) + 1;
             }
             
+            // 检查暗杠：手牌中有4张相同的牌
             for (const id in tileCounts) {
                 if (tileCounts[id] === 4) {
                     for (const tile of hand) {
@@ -2993,27 +3015,38 @@ Arrange time reasonably, enjoy a healthy life.</p>
                             return {
                                 canGang: true,
                                 gangType: 'angang',
-                                tile: tile
+                                tile: tile,
+                                meldIndex: null  // 暗杠不需要meldIndex
                             };
                         }
                     }
                 }
             }
             
-            for (const meld of melds) {
-                if (meld.type === 'peng') {
+            // 检查补杠：遍历所有碰的牌，如果手牌中有和碰的牌相同的牌，可以补杠
+            // 补杠是玩家在碰完一组牌之后的任意回合再摸到一张相同的牌
+            for (let i = 0; i < melds.length; i++) {
+                const meld = melds[i];
+                // 只检查碰的牌（type === 'peng'），不检查已经杠的牌
+                if (meld.type === 'peng' && meld.tiles && meld.tiles.length > 0) {
                     const meldTile = meld.tiles[0];
+                    const meldTileId = tileId(meldTile);
+                    
+                    // 遍历手牌，查找是否有和碰的牌相同的牌
                     for (const tile of hand) {
+                        // 跳过红中（红中不能用于补杠）
                         if (state.redDragonWildcard && tile.type === 'honor' && tile.rank === 'red') {
                             continue;
                         }
                         
-                        if (tile.suit === meldTile.suit && tile.rank === meldTile.rank) {
+                        // 使用tileId进行比较，确保正确匹配
+                        const handTileId = tileId(tile);
+                        if (handTileId === meldTileId) {
                             return {
                                 canGang: true,
                                 gangType: 'jiagang',
-                                tile: tile,
-                                meldIndex: state.melds[playerIndex].indexOf(meld)
+                                tile: tile,  // 返回手牌中的这张牌
+                                meldIndex: i  // 使用循环索引，更可靠
                             };
                         }
                     }
@@ -3175,15 +3208,29 @@ Arrange time reasonably, enjoy a healthy life.</p>
         }
         
         function doGangAfterDraw(playerIndex, gangType, tile, meldIndex = null) {
+            console.log('doGangAfterDraw called:', { playerIndex, gangType, tile, meldIndex, hand: state.hands[playerIndex], melds: state.melds[playerIndex] });
             const hand = state.hands[playerIndex];
             
             if (gangType === 'angang') {
+                // 暗杠：从手牌中移除4张相同的牌
+                const tileIdToMatch = tileId(tile);
                 let removed = 0;
                 for (let i = hand.length - 1; i >= 0; i--) {
-                    if (hand[i].suit === tile.suit && hand[i].rank === tile.rank && removed < 4) {
+                    if (tileId(hand[i]) === tileIdToMatch && removed < 4) {
                         hand.splice(i, 1);
                         removed++;
                     }
+                }
+                
+                if (removed < 4) {
+                    log(`Error: Could not find 4 matching tiles for Concealed Kong. Found: ${removed}`);
+                    if (playerIndex === 0) {
+                        state.hasActionBeenProcessed = false;
+                        state.isReacting = false;
+                        showActionButtons();
+                        showActionPrompt();
+                    }
+                    return false;
                 }
                 
                 const gangTiles = [
@@ -3202,15 +3249,74 @@ Arrange time reasonably, enjoy a healthy life.</p>
                 
                 log(`${PLAYER_NAMES[playerIndex]} Concealed Kong ${tileToEnglish(tile)}`);
             } else if (gangType === 'jiagang') {
+                // 补杠：需要确保meldIndex有效
+                if (meldIndex === null || meldIndex === undefined || meldIndex < 0 || meldIndex >= state.melds[playerIndex].length) {
+                    const errorMsg = `Error: Invalid meldIndex ${meldIndex} for Added Kong. Total melds: ${state.melds[playerIndex].length}`;
+                    log(errorMsg);
+                    console.error(errorMsg, { meldIndex, melds: state.melds[playerIndex] });
+                    if (playerIndex === 0) {
+                        state.hasActionBeenProcessed = false;
+                        state.isReacting = false;
+                        showActionButtons();
+                        showActionPrompt();
+                    }
+                    return false;
+                }
+                
+                const meld = state.melds[playerIndex][meldIndex];
+                if (!meld) {
+                    const errorMsg = `Error: Meld at index ${meldIndex} does not exist`;
+                    log(errorMsg);
+                    console.error(errorMsg);
+                    if (playerIndex === 0) {
+                        state.hasActionBeenProcessed = false;
+                        state.isReacting = false;
+                        showActionButtons();
+                        showActionPrompt();
+                    }
+                    return false;
+                }
+                
+                if (meld.type !== 'peng') {
+                    const errorMsg = `Error: Meld at index ${meldIndex} is not a peng, it is ${meld.type}`;
+                    log(errorMsg);
+                    console.error(errorMsg, meld);
+                    if (playerIndex === 0) {
+                        state.hasActionBeenProcessed = false;
+                        state.isReacting = false;
+                        showActionButtons();
+                        showActionPrompt();
+                    }
+                    return false;
+                }
+                
+                // 从手牌中移除一张相同的牌（使用tileId进行比较，确保正确匹配）
+                const tileIdToMatch = tileId(tile);
                 let removed = 0;
                 for (let i = hand.length - 1; i >= 0; i--) {
-                    if (hand[i].suit === tile.suit && hand[i].rank === tile.rank && removed < 1) {
+                    if (tileId(hand[i]) === tileIdToMatch && removed < 1) {
                         hand.splice(i, 1);
                         removed++;
                     }
                 }
                 
-                const meld = state.melds[playerIndex][meldIndex];
+                if (removed === 0) {
+                    const errorMsg = `Error: Could not find matching tile in hand for Added Kong. Looking for: ${tileToEnglish(tile)} (${tileIdToMatch})`;
+                    log(errorMsg);
+                    console.error(errorMsg, {
+                        hand: hand.map(t => ({ tile: t, id: tileId(t) })),
+                        lookingFor: tileIdToMatch
+                    });
+                    if (playerIndex === 0) {
+                        state.hasActionBeenProcessed = false;
+                        state.isReacting = false;
+                        showActionButtons();
+                        showActionPrompt();
+                    }
+                    return false;
+                }
+                
+                // 将碰转换为杠
                 meld.type = 'gang';
                 meld.gangType = 'jiagang';
                 meld.tiles.push({...tile});
@@ -3262,6 +3368,9 @@ Arrange time reasonably, enjoy a healthy life.</p>
                     processPendingActions();
                 }, 1000);
             }
+            
+            // 返回成功，表示补杠/暗杠操作完成
+            return true;
         }
         
         function skipAction() {
@@ -3285,6 +3394,24 @@ Arrange time reasonably, enjoy a healthy life.</p>
         
         function checkWinCondition(playerIndex) {
             const hand = [...state.hands[playerIndex]];
+            console.log('checkWinCondition called for player', playerIndex, 'hand length:', hand.length, 'hand:', hand.map(t => tileId(t)));
+            
+            // 检查特殊胡牌：七小对和十三幺
+            if (hand.length === 14) {
+                console.log('Hand length is 14, checking special wins');
+                // 检查七小对
+                if (checkSevenPairs(hand)) {
+                    console.log('Seven Pairs matched!');
+                    return true;
+                }
+                // 检查十三幺
+                console.log('Checking Thirteen Orphans...');
+                if (checkThirteenOrphans(hand)) {
+                    console.log('Thirteen Orphans matched!');
+                    return true;
+                }
+                console.log('Thirteen Orphans did not match');
+            }
             
             if ((hand.length - 2) % 3 !== 0) return false;
             
@@ -3328,6 +3455,213 @@ Arrange time reasonably, enjoy a healthy life.</p>
                 if (canFormMeldGroupsWithRedDragon(counts, redDragons - 2, n)) {
                     return true;
                 }
+            }
+            
+            return false;
+        }
+        
+        // 检查七小对：14张牌，7组对子，红中可以当作万能牌
+        function checkSevenPairs(hand) {
+            if (hand.length !== 14) return false;
+            
+            const counts = {};
+            let redDragons = 0;
+            
+            // 统计每种牌的数量，红中单独统计
+            for (const tile of hand) {
+                if (state.redDragonWildcard && tile.type === 'honor' && tile.rank === 'red') {
+                    redDragons++;
+                } else {
+                    const id = tileId(tile);
+                    counts[id] = (counts[id] || 0) + 1;
+                }
+            }
+            
+            // 统计对子数量
+            let pairs = 0;
+            let remainingRedDragons = redDragons;
+            
+            // 先处理已有的对子（2张相同的牌）
+            for (const id in counts) {
+                if (counts[id] >= 2) {
+                    pairs++;
+                    counts[id] -= 2;
+                    if (counts[id] === 0) delete counts[id];
+                }
+            }
+            
+            // 处理单张牌，尝试用红中配对
+            for (const id in counts) {
+                if (counts[id] === 1 && remainingRedDragons >= 1) {
+                    pairs++;
+                    remainingRedDragons--;
+                    delete counts[id];
+                }
+            }
+            
+            // 剩余的红中可以组成对子
+            pairs += Math.floor(remainingRedDragons / 2);
+            
+            // 检查是否还有剩余的牌（不能组成对子的单张）
+            const remainingTiles = Object.keys(counts).length;
+            const remainingSingleRedDragons = remainingRedDragons % 2;
+            
+            // 必须正好是7组对子，不能有剩余的牌
+            return pairs === 7 && remainingTiles === 0 && remainingSingleRedDragons === 0;
+        }
+        
+        // 检查十三幺：特定13种牌各一张，加上其中任意一种的第2张作为对子
+        function checkThirteenOrphans(hand) {
+            console.log('checkThirteenOrphans called with hand length:', hand.length);
+            if (hand.length !== 14) {
+                console.log('Hand length is not 14, returning false');
+                return false;
+            }
+            
+            // 定义十三幺需要的13种牌的ID
+            // 注意：牌的suit是 'm'(万)、'p'(筒)、's'(条)、'z'(字牌)
+            // tileId函数：对于数字牌返回 suit+rank，对于字牌返回 suit+rank
+            const requiredIds = [
+                // 数字牌：一万、九万、一条、九条、一筒、九筒
+                'm1', 'm9',  // 一万、九万
+                's1', 's9',  // 一条、九条
+                'p1', 'p9',  // 一筒、九筒
+                // 字牌：东南西北中发白
+                'zeast', 'zsouth', 'zwest', 'znorth',
+                'zred', 'zgreen', 'zwhite'
+            ];
+            
+            const counts = {};
+            let redDragons = 0;
+            
+            // 统计手牌
+            for (const tile of hand) {
+                if (state.redDragonWildcard && tile.type === 'honor' && tile.rank === 'red') {
+                    redDragons++;
+                } else {
+                    const id = tileId(tile);
+                    counts[id] = (counts[id] || 0) + 1;
+                }
+            }
+            
+            // 检查是否有非必需牌
+            for (const id in counts) {
+                if (!requiredIds.includes(id)) {
+                    console.log('Thirteen Orphans: Found non-required tile:', id);
+                    return false; // 有非必需牌，不符合十三幺
+                }
+            }
+            
+            console.log('Thirteen Orphans: All tiles are required tiles', { counts, redDragons });
+            
+            // 统计每种必需牌的数量（包括红中，但红中可能不在counts中，而在redDragons中）
+            const requiredCounts = {};
+            for (const id of requiredIds) {
+                requiredCounts[id] = counts[id] || 0;
+            }
+            
+            // 如果红中作为万能牌，它在redDragons中，不在counts中
+            // 如果红中不作为万能牌，它在counts中，不在redDragons中
+            // 所以需要检查两种情况
+            
+            // 统计缺少的牌、正好1张的牌、和对子（不包括红中，红中单独处理）
+            let missingTiles = 0;
+            let singleTiles = 0;
+            let pairs = 0;
+            let tripleOrMore = 0;
+            
+            for (const id in requiredCounts) {
+                if (id === 'zred') continue; // 红中单独处理
+                const count = requiredCounts[id];
+                if (count === 0) {
+                    missingTiles++;
+                } else if (count === 1) {
+                    singleTiles++;
+                } else if (count === 2) {
+                    pairs++;
+                } else {
+                    tripleOrMore++;
+                }
+            }
+            
+            // 检查红中：可能在counts中（不作为万能牌）或在redDragons中（作为万能牌）
+            // 红中的ID是 'zred'
+            const redDragonInCounts = requiredCounts['zred'] || 0;
+            const totalRedDragons = redDragonInCounts + redDragons;
+            
+            // 添加调试信息
+            console.log('Thirteen Orphans check:', {
+                requiredCounts,
+                missingTiles,
+                singleTiles,
+                pairs,
+                tripleOrMore,
+                redDragons,
+                redDragonInCounts,
+                totalRedDragons,
+                counts
+            });
+            
+            // 如果有超过2张的牌，不符合十三幺
+            if (tripleOrMore > 0) return false;
+            
+            // 十三幺要求：13种牌各至少1张，其中一种有2张作为对子
+            // 总共14张 = 13种牌各1张 + 1张作为对子
+            // 注意：requiredCounts不包括红中，所以只有12种牌
+            
+            // 情况1：没有缺少的牌，正好有1个对子
+            // requiredCounts不包括红中，所以只有12种牌
+            // 如果九筒是对子，那么：pairs=1, singleTiles=11（其他11种牌各1张）
+            // 如果红中有1张，那么：11张单张 + 2张九筒（对子） + 1张红中 = 14张，13种牌，符合十三幺
+            // 如果红中有0张，那么：11张单张 + 2张九筒（对子） = 13张，但只有12种牌，不符合十三幺
+            
+            // 情况1：没有缺少的牌，正好有1个对子
+            // requiredCounts不包括红中，所以只有12种牌
+            // 如果九筒是对子，那么：pairs=1, singleTiles=11（其他11种牌各1张）
+            // 如果红中有1张（在redDragons中），那么：11张单张 + 2张九筒（对子） + 1张红中 = 14张，13种牌，符合十三幺
+            // 如果红中有0张，那么：11张单张 + 2张九筒（对子） = 13张，但只有12种牌，不符合十三幺
+            
+            // 情况1a：没有红中，只有12种牌，其中1种是对子（不符合十三幺，因为需要13种牌）
+            // 情况1a：没有红中，只有12种牌，其中1种是对子（不符合十三幺，因为需要13种牌）
+            if (missingTiles === 0 && pairs === 1 && totalRedDragons === 0) {
+                return false; // 没有红中，只有12种牌，不符合十三幺
+            }
+            
+            // 情况1b：如果红中有1张（在counts中或redDragons中），且其他12种牌各1张，其中1种是对子
+            if (missingTiles === 0 && pairs === 1 && totalRedDragons === 1) {
+                // 其他11种牌各1张 + 1个对子 + 1张红中 = 14张牌，13种牌，符合十三幺
+                console.log('Thirteen Orphans matched: case 1b', { singleTiles, pairs, totalRedDragons, missingTiles });
+                return singleTiles === 11;
+            }
+            
+            // 情况2：用红中替代缺少的牌
+            // 如果缺少的牌可以用红中替代，且正好有1个对子
+            if (missingTiles > 0 && missingTiles <= redDragons && pairs === 1) {
+                const usedRedDragons = missingTiles;
+                const remainingRedDragons = redDragons - usedRedDragons;
+                // 剩余的红中应该为0（因为对子已经用掉了，且已经用红中替代了缺少的牌）
+                return remainingRedDragons === 0 && singleTiles + missingTiles === 12;
+            }
+            
+            // 情况3：红中本身作为对子
+            // 如果红中>=2张，且其他12种牌各1张，没有其他对子
+            if (redDragons >= 2 && pairs === 0 && missingTiles === 0) {
+                const redDragonPairs = Math.floor(redDragons / 2);
+                const remainingRedDragons = redDragons % 2;
+                // 红中正好是1个对子，没有多余的红中，其他12种牌各1张
+                // 注意：requiredCounts不包括红中，所以只有12种牌，singleTiles应该是12
+                return redDragonPairs === 1 && remainingRedDragons === 0 && singleTiles === 12;
+            }
+            
+            // 情况4：红中既作为对子，又替代缺少的牌
+            // 如果缺少的牌可以用红中替代，且红中本身是对子
+            if (missingTiles > 0 && redDragons >= (missingTiles + 2)) {
+                const usedForMissing = missingTiles;
+                const remainingForPair = redDragons - usedForMissing;
+                const redDragonPairs = Math.floor(remainingForPair / 2);
+                const remainingRedDragons = remainingForPair % 2;
+                // 红中替代缺少的牌后，还能组成1个对子，且没有多余的红中
+                return redDragonPairs === 1 && remainingRedDragons === 0 && pairs === 0 && singleTiles + missingTiles === 12;
             }
             
             return false;
@@ -3452,6 +3786,10 @@ Arrange time reasonably, enjoy a healthy life.</p>
                             state.availableActions.gangTile = gangCheck.tile;
                             state.availableActions.meldIndex = gangCheck.meldIndex;
                             
+                            // 重置状态，确保按钮可以点击
+                            state.hasActionBeenProcessed = false;
+                            state.isReacting = true;
+                            
                             showActionButtons();
                             showActionPrompt();
                             log(`You can ${gangCheck.gangType === 'angang' ? 'Concealed Kong' : 'Added Kong'} ${tileToEnglish(gangCheck.tile)}, decide within 10 seconds`);
@@ -3466,7 +3804,6 @@ Arrange time reasonably, enjoy a healthy life.</p>
                                 skipAction();
                             }, REACTION_TIME);
                             
-                            state.isReacting = true;
                             return;
                         }
                     } else {
@@ -3562,6 +3899,10 @@ Arrange time reasonably, enjoy a healthy life.</p>
                     state.availableActions.gangTile = gangCheck.tile;
                     state.availableActions.meldIndex = gangCheck.meldIndex;
                     
+                    // 重置状态，确保按钮可以点击
+                    state.hasActionBeenProcessed = false;
+                    state.isReacting = true;
+                    
                     showActionButtons();
                     showActionPrompt();
                     log(`You can ${gangCheck.gangType === 'angang' ? 'Concealed Kong' : 'Added Kong'} ${tileToEnglish(gangCheck.tile)}, decide within 10 seconds`);
@@ -3576,7 +3917,6 @@ Arrange time reasonably, enjoy a healthy life.</p>
                         skipAction();
                     }, REACTION_TIME);
                     
-                    state.isReacting = true;
                     return;
                 }
                 
@@ -3655,6 +3995,10 @@ Arrange time reasonably, enjoy a healthy life.</p>
             
             winBtn.addEventListener('click', () => {
                 if (checkWinCondition(0)) {
+                    // 播放胡牌音效
+                    const huAudio = new Audio('hu.mp3');
+                    huAudio.play().catch(err => console.log('Audio play failed:', err));
+                    
                     processWin(0);
                     winBtn.disabled = true;
                 } else {
@@ -3680,6 +4024,10 @@ Arrange time reasonably, enjoy a healthy life.</p>
                     countdownEl.style.display = 'none';
                     hideActionPrompt();
                     
+                    // 播放碰牌音效
+                    const pengAudio = new Audio('Peng.mp3');
+                    pengAudio.play().catch(err => console.log('Audio play failed:', err));
+                    
                     doPeng(0);
                     hideActionButtons();
                     state.isReacting = false;
@@ -3687,8 +4035,17 @@ Arrange time reasonably, enjoy a healthy life.</p>
             });
             
             gangBtn.addEventListener('click', () => {
+                console.log('Gang button clicked!', {
+                    availableActions: state.availableActions,
+                    hasActionBeenProcessed: state.hasActionBeenProcessed,
+                    isReacting: state.isReacting
+                });
+                
                 if (state.availableActions.gang || state.availableActions.gangAfterDraw) {
-                    if (state.hasActionBeenProcessed) return;
+                    if (state.hasActionBeenProcessed) {
+                        console.log('Action already processed, returning');
+                        return;
+                    }
                     state.hasActionBeenProcessed = true;
                     
                     if (state.reactionTimer) {
@@ -3705,14 +4062,37 @@ Arrange time reasonably, enjoy a healthy life.</p>
                     hideActionPrompt();
                     
                     if (state.availableActions.gangAfterDraw) {
+                        console.log('Executing gangAfterDraw:', {
+                            gangType: state.availableActions.gangType,
+                            gangTile: state.availableActions.gangTile,
+                            meldIndex: state.availableActions.meldIndex,
+                            melds: state.melds[0]
+                        });
+                        
                         // 修复：确保传递正确的参数
-                        doGangAfterDraw(0, state.availableActions.gangType, state.availableActions.gangTile, state.availableActions.meldIndex);
+                        const success = doGangAfterDraw(0, state.availableActions.gangType, state.availableActions.gangTile, state.availableActions.meldIndex);
+                        
+                        console.log('doGangAfterDraw result:', success);
+                        
+                        if (!success) {
+                            console.log('Gang failed, resetting state');
+                            // 如果补杠失败，重置状态，让用户可以重试
+                            state.hasActionBeenProcessed = false;
+                            state.isReacting = false;
+                            showActionButtons();
+                            showActionPrompt();
+                            return;
+                        }
                     } else {
+                        console.log('Executing doGang (明杠)');
                         doGang(0);
                     }
                     
                     hideActionButtons();
                     state.isReacting = false;
+                    console.log('Gang completed successfully');
+                } else {
+                    console.log('No gang action available');
                 }
             });
             
