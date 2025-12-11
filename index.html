@@ -1646,6 +1646,12 @@ Arrange time reasonably, enjoy a healthy life.</p>
             <!-- 规则按钮 -->
             <button id="btn-rules" class="rules-btn">Rules</button>
             
+            <!-- 背景音乐和音效控制按钮 -->
+            <div style="margin-top: 10px; display: flex; gap: 5px;">
+                <button id="btn-bgm" class="rules-btn" style="flex: 1;">🔊 BGM: ON</button>
+                <button id="btn-sound" class="rules-btn" style="flex: 1;">🔊 Sound: ON</button>
+            </div>
+            
             <div class="scoreboard">
                 <div class="player-box" id="score-0">E (You): 0</div>
                 <div class="player-box" id="score-1">S: 0</div>
@@ -1784,12 +1790,100 @@ Arrange time reasonably, enjoy a healthy life.</p>
         const rulesModal = document.getElementById('rules-modal');
         const closeRules = document.querySelector('.close-rules');
         
+        // 背景音乐相关
+        const bgmBtn = document.getElementById('btn-bgm');
+        const soundBtn = document.getElementById('btn-sound');
+        const bgmAudio = new Audio('bgm.mp3');
+        bgmAudio.loop = true; // 循环播放
+        bgmAudio.volume = 0.5; // 设置音量
+        let bgmEnabled = true;
+        let soundEnabled = true; // 音效开关（出牌、碰牌、杠牌音效）
+        
+        // 初始化背景音乐（需要用户交互后才能播放）
+        // 延迟播放，等待用户第一次交互
+        let bgmInitialized = false;
+        function initBGM() {
+            if (!bgmInitialized && bgmEnabled) {
+                bgmAudio.play().catch(err => {
+                    console.log('BGM play failed (may need user interaction):', err);
+                });
+                bgmInitialized = true;
+            }
+        }
+        
+        // 背景音乐控制按钮（左边）
+        bgmBtn.addEventListener('click', () => {
+            if (bgmEnabled) {
+                bgmAudio.pause();
+                bgmEnabled = false;
+                bgmBtn.textContent = '🔇 BGM: OFF';
+            } else {
+                bgmAudio.play().catch(err => {
+                    console.log('BGM play failed:', err);
+                });
+                bgmEnabled = true;
+                bgmBtn.textContent = '🔊 BGM: ON';
+            }
+            bgmInitialized = true;
+        });
+        
+        // 音效控制按钮（右边）
+        soundBtn.addEventListener('click', () => {
+            if (soundEnabled) {
+                soundEnabled = false;
+                soundBtn.textContent = '🔇 Sound: OFF';
+            } else {
+                soundEnabled = true;
+                soundBtn.textContent = '🔊 Sound: ON';
+            }
+        });
+        
+        // 播放出牌音效的函数
+        function playDiscardSound() {
+            if (!soundEnabled) return; // 如果音效关闭，不播放
+            const discardAudio = new Audio('draw.mp3');
+            discardAudio.play().catch(err => console.log('Discard sound play failed:', err));
+            // 初始化背景音乐（如果还没有初始化）
+            initBGM();
+        }
+        
+        // 播放碰牌音效的函数
+        function playPengSound() {
+            if (!soundEnabled) return; // 如果音效关闭，不播放
+            const pengAudio = new Audio('Peng.mp3');
+            pengAudio.play().catch(err => console.log('Peng sound play failed:', err));
+            // 初始化背景音乐（如果还没有初始化）
+            initBGM();
+        }
+        
+        // 播放杠牌音效的函数
+        function playGangSound() {
+            if (!soundEnabled) return; // 如果音效关闭，不播放
+            const gangAudio = new Audio('Kong.mp3');
+            gangAudio.play().catch(err => console.log('Gang sound play failed:', err));
+            // 初始化背景音乐（如果还没有初始化）
+            initBGM();
+        }
+        
+        // 播放胡牌音效的函数
+        function playWinSound() {
+            if (!soundEnabled) return; // 如果音效关闭，不播放
+            const huAudio = new Audio('hu.mp3');
+            huAudio.play().catch(err => console.log('Win sound play failed:', err));
+            // 初始化背景音乐（如果还没有初始化）
+            initBGM();
+        }
+        
         // 听牌相关元素
         const tingPaiPanel = document.getElementById('tingpai-panel');
         const tingPaiTilesEl = document.getElementById('tingpai-tiles');
         
         let isDragging = false;
         let dragOffsetX, dragOffsetY;
+        
+        // 初始化背景音乐（在用户第一次交互时）
+        document.addEventListener('click', initBGM, { once: true });
+        document.addEventListener('touchstart', initBGM, { once: true });
         
         // 跳转到规则网页
         function showRules() {
@@ -2899,6 +2993,9 @@ Arrange time reasonably, enjoy a healthy life.</p>
                         state.firstTurn = false;
                     }
                     
+                    // 播放出牌音效
+                    playDiscardSound();
+                    
                     log('You discard: ' + tileToEnglish(t));
                     renderAll();
                     checkTingPai(); // 检查听牌状态
@@ -2934,6 +3031,9 @@ Arrange time reasonably, enjoy a healthy life.</p>
                 state.waitingForDiscard = false;
                 
                 state.newDrawTileId = null;
+                
+                // 播放出牌音效
+                playDiscardSound();
                 
                 if (state.firstTurn) {
                     state.firstTurn = false;
@@ -3122,6 +3222,9 @@ Arrange time reasonably, enjoy a healthy life.</p>
                     state.lastDiscard = dt;
                     state.lastDiscardPlayer = playerIndex;
                     state.waitingForDiscard = false;
+                    
+                    // 播放出牌音效
+                    playDiscardSound();
                     
                     log(`${PLAYER_NAMES[playerIndex]} discards: ${tileToEnglish(dt)}`);
                     renderAll();
@@ -3849,6 +3952,9 @@ Arrange time reasonably, enjoy a healthy life.</p>
                         state.lastDiscardPlayer = state.currentPlayer;
                         state.waitingForDiscard = false;
                         
+                        // 播放出牌音效
+                        playDiscardSound();
+                        
                         log(`${PLAYER_NAMES[state.currentPlayer]} discards: ${tileToEnglish(dt)}`);
                         renderAll();
                         checkTingPai(); // 检查听牌状态
@@ -3957,6 +4063,9 @@ Arrange time reasonably, enjoy a healthy life.</p>
                 state.lastDiscardPlayer = state.currentPlayer;
                 state.waitingForDiscard = false;
                 
+                // 播放出牌音效
+                playDiscardSound();
+                
                 log(`${PLAYER_NAMES[state.currentPlayer]} discards: ${tileToEnglish(dt)}`);
                 renderAll();
                 checkTingPai(); // 检查听牌状态
@@ -3996,8 +4105,7 @@ Arrange time reasonably, enjoy a healthy life.</p>
             winBtn.addEventListener('click', () => {
                 if (checkWinCondition(0)) {
                     // 播放胡牌音效
-                    const huAudio = new Audio('hu.mp3');
-                    huAudio.play().catch(err => console.log('Audio play failed:', err));
+                    playWinSound();
                     
                     processWin(0);
                     winBtn.disabled = true;
@@ -4025,8 +4133,7 @@ Arrange time reasonably, enjoy a healthy life.</p>
                     hideActionPrompt();
                     
                     // 播放碰牌音效
-                    const pengAudio = new Audio('Peng.mp3');
-                    pengAudio.play().catch(err => console.log('Audio play failed:', err));
+                    playPengSound();
                     
                     doPeng(0);
                     hideActionButtons();
@@ -4060,6 +4167,9 @@ Arrange time reasonably, enjoy a healthy life.</p>
                     
                     countdownEl.style.display = 'none';
                     hideActionPrompt();
+                    
+                    // 播放杠牌音效
+                    playGangSound();
                     
                     if (state.availableActions.gangAfterDraw) {
                         console.log('Executing gangAfterDraw:', {
