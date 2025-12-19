@@ -635,6 +635,14 @@
             width: 90%;
         }
         
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+        
         .seat.left {
             left: 30px;
             top: 50%;
@@ -1007,6 +1015,16 @@
                 width: 95%;
             }
             
+            .action-buttons {
+                gap: 6px;
+                margin-bottom: 8px;
+            }
+            
+            .action-buttons button {
+                padding: 6px 10px;
+                font-size: 12px;
+            }
+            
             .seat.left {
                 left: 10px;
             }
@@ -1351,6 +1369,16 @@
                 bottom: 5px;
             }
             
+            .action-buttons {
+                gap: 4px;
+                margin-bottom: 6px;
+            }
+            
+            .action-buttons button {
+                padding: 5px 8px;
+                font-size: 11px;
+            }
+            
             .seat.left {
                 left: 5px;
             }
@@ -1578,6 +1606,16 @@
                 font-size: 14px;
             }
             
+            .action-buttons {
+                gap: 6px;
+                margin-bottom: 8px;
+            }
+            
+            .action-buttons button {
+                padding: 7px 11px;
+                font-size: 13px;
+            }
+            
             .rules-btn {
                 width: 100%;
                 padding: 12px 15px;
@@ -1594,11 +1632,8 @@
 </head>
 <body>
     <header>
-        <h1>Guangdong Mahjong - Red Dragon Variant</h1>
-        <p>Resist bad games, reject pirated games.
-Pay attention to self-protection, beware of being deceived.
-Moderate gaming benefits the brain, addiction hurts the body.
-Arrange time reasonably, enjoy a healthy life.</p>
+        <h1>Guangdong Mahjong</h1>
+        <p>Resist harmful games; Reject pirated games.Guard your safety; Beware of fraud.Moderate gaming sharpens the mind， overindulgence harms the body.Arrange your time wisely; Enjoy a healthy life.</p>
     </header>
     
     <div class="main-container">
@@ -1613,6 +1648,12 @@ Arrange time reasonably, enjoy a healthy life.</p>
                     
                     <div class="seat bottom">
                         <div>E (You)</div>
+                        <div class="action-buttons">
+                            <button id="btn-win" class="win" disabled>Mahjong!</button>
+                            <button id="btn-peng" class="action" style="display: none;">Pung!</button>
+                            <button id="btn-gang" class="action" style="display: none;">Kong!</button>
+                            <button id="btn-skip" class="action" style="display: none;">Skip</button>
+                        </div>
                         <div id="hand-0" class="hand"></div>
                         <div id="melds-0" class="melds-container"></div>
                     </div>
@@ -1662,10 +1703,6 @@ Arrange time reasonably, enjoy a healthy life.</p>
             <div class="info-panel">
                 <div class="controls">
                     <button id="btn-start">New Game</button>
-                    <button id="btn-win" class="win" disabled>Mahjong!</button>
-                    <button id="btn-peng" class="action" style="display: none;">Pung!</button>
-                    <button id="btn-gang" class="action" style="display: none;">Kong!</button>
-                    <button id="btn-skip" class="action" style="display: none;">Skip</button>
                     <button id="btn-dev" class="dev-mode">Dev Mode</button>
                 </div>
                 <div class="log" id="log">
